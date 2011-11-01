@@ -29,6 +29,20 @@ $ ->
 				includeInJSON: false
 		}]
 
+		initialize: ->
+			@bind "change", @save
+			@get("settings").bind "change", @save
+			@get("settings").bind "remove", @save
+
+		save: =>
+			$.ajax
+				url: document.location.href
+				type: 'POST'
+				dataType: 'json'
+				data: JSON.stringify @toJSON()
+				contentType: 'application/json; charset=utf-8'
+				success: (data) -> $(window).trigger "save"
+
 ###############################################################################
 
 	window.Rule = class Rule extends Backbone.RelationalModel
@@ -60,25 +74,11 @@ $ ->
 	window.RuleList = class RuleList extends Backbone.Collection
 		model: Rule
 
-		initialize: ->
-			@bind "change", @save
-			@bind "remove", @save
-
-		save: ->
-			plist.settings = @toJSON()
-			$.ajax
-				url: document.location.href
-				type: 'POST'
-				dataType: 'json'
-				data: JSON.stringify plist
-				contentType: 'application/json; charset=utf-8'
-				success: (data) -> $(window).trigger "save"
-
 ###############################################################################
 
 	window.RulesView = class RulesView extends Backbone.View
 
-		el: $(".table")
+		el: $("#content")
 
 		events:
 			'click button.add': 'addRule'
@@ -90,7 +90,12 @@ $ ->
 
 
 		render: =>
-			@model.each (rule, index) =>
+			@$('tbody').empty()
+			@$('.table').css
+				backgroundColor: @model.get("settings").first().get("settings").get("background")
+				color: @model.get("settings").first().get("settings").get("foreground")
+
+			@model.get("settings").each (rule, index) =>
 				if index is 0
 					@renderMainSettings rule
 				else
@@ -102,7 +107,7 @@ $ ->
 			newRule
 
 		renderMainSettings: (rule) ->
-			$("body").append((new SettingsView { model: rule }).render().el)
+			@$(".mainSettings").html((new SettingsView { model: rule }).render().el)
 
 		addRule: => @model.add new Rule
 
@@ -115,15 +120,22 @@ $ ->
 		template: _.template($("#settingsItemTemplate").html())
 
 		events:
-			"change .b"       : "bold"
-			"change .i"       : "italic"
-			"change .u"       : "underline"
-			"change .name"    : "name"
-			"change .scope"   : "scope"
-			"change .fg"      : "fg"
-			"change .bg"      : "bg"
-			"click .delete"   : "delete"
-			"click .colorwell": "showColorPicker"
+			"change .b"                : "bold"
+			"change .i"                : "italic"
+			"change .u"                : "underline"
+			"change .name"             : "name"
+
+			"change .fg"               : "fg"
+			"change .bg"               : "bg"
+			"click .delete"            : "delete"
+			"click .colorwell"         : "showColorPicker"
+			"click"                    : "focus"
+			"focus"                    : "select"
+			'dblclick span'            : "activate"
+			'blur input[name*="name"]' : "deactivate"
+			'keydown'                 : "handleKeypress"
+
+		isSelected: => $(@el).hasClass('selected')
 
 		initialize: ->
 			@model.get("settings").bind "change", => @render()
@@ -135,7 +147,7 @@ $ ->
 
 			content = @template _.extend viewDefaults, @model.toJSON()
 			@el.innerHTML = content
-
+			$(@el).attr tabindex: 0
 			fontStyle = @model.get("settings").get "fontStyle"
 			@$('.b').prop "checked", fontStyle.indexOf("bold") > -1
 			@$('.i').prop "checked", fontStyle.indexOf("italic") > -1
@@ -164,12 +176,31 @@ $ ->
 			window.colorPicker.render().setPosition().bind "commit", (color) =>
 				$(e.currentTarget).val(color).change()
 
+		activate: => $(@el).addClass("active").find('input[name*="name"]').focus()
+
+		deactivate: => $(@el).removeClass("active")
+
+		focus: =>	$(@el).focus()
+
+		select: =>
+			$(@el).parent().find(".selected").removeClass("selected")
+			$(@el).addClass('selected')
+			window.active.model = @model
+			window.active.render()
+
+		handleKeypress: (e) =>
+			if (e.keyCode is 8 or e.keyCode is 46) and $(@el).is(":focus")
+				e.preventDefault()
+				@delete() if confirm "Delete this rule?"
+
+
 
 		bold: (e)      => @toggleFontStyle "bold", e.currentTarget.checked
 		italic: (e)    => @toggleFontStyle "italic", e.currentTarget.checked
 		underline: (e) => @toggleFontStyle "underline", e.currentTarget.checked
-		name: (e)      =>	@model.set "name": e.currentTarget.value
-		scope: (e)     =>	@model.set "scope": e.currentTarget.value
+		name: (e)      =>
+			@model.set "name": e.currentTarget.value
+			@render()
 		fg: (e)        =>	@model.get("settings").set "foreground": e.currentTarget.value
 		bg: (e)        =>	@model.get("settings").set "background": e.currentTarget.value
 
@@ -259,6 +290,52 @@ $ ->
 					rgba: @rgba()
 
 ###############################################################################
+	window.HeaderView = class HeaderView extends Backbone.View
+
+		el: $("header")
+
+		render: ->
+			@$("h1").text @model.get "name"
+			@$(".author").text @model.get "author"
+			@
+
+	window.ActiveView = class ActiveView extends Backbone.View
+
+		el: $("div.selected")
+
+		events:
+			"change input": "update"
+
+		render: ->
+			@$('input').val @model.get("scope")
+
+		update: (e) => @model.set scope: e.currentTarget.value
+
+	window.SidebarView = class SidebarView extends Backbone.View
+
+		el: $("#sidebar")
+
+		events:
+			"click a": "select"
+
+		select: (e) =>
+
+			$.getJSON "#{e.currentTarget.href}&o=json", (data) =>
+				window.myList = new Plist data
+				window.rules.model = myList
+				window.rules.render()
+
+				window.header.model = myList
+				window.header.render()
+				document.title = "Theme: #{myList.get("name")}"
+				history.pushState({}, "", e.currentTarget.href)
+
+				@$(".selected").removeClass("selected")
+				$(e.currentTarget).addClass("selected")
+			e.preventDefault()
+
+
+###############################################################################
 
 	class ColorPickerView extends Backbone.View
 
@@ -336,10 +413,15 @@ $ ->
 
 	window.myList = new Plist plist
 
-	new RulesView({ model: myList.get("settings") }).render()
+	window.rules = new RulesView({ model: myList }).render()
+
+	window.header = new HeaderView({ model: myList }).render()
+
+	window.active = new ActiveView
+
+	new SidebarView
 
 	window.colorPicker = new ColorPickerView model: new ColorModel
 	$('body').append window.colorPicker.el
 
 	$('tbody').fadeIn(100)
-	$("select").change -> window.location = "/t?f=" + this.value

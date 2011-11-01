@@ -1,56 +1,50 @@
-- settings = @plist["settings"][0]["settings"]
-
 %script
 	window.plist = #{@plist.to_json};
-%div.select
-	%label{ :for => "f"} File
-	%select#f{ :name => "f" }
-		- @files.each do |f|
-			%option{ :value => f, :selected => CGI::unescape(f) == @file }= CGI::unescape f
-		end
+
 %header
 	%h1= @plist["name"]
 	%p.author by #{@plist["author"]}
-%div.table
-	%div.header
-		%table
-			%colgroup
-				%col.name
-				%col.fg
-				%col.bg
-				%col.b
-				%col.scope
-				%col.ctrl
+%div.wrapper
+	%section#sidebar
+		%ul
+			- @files.each do |f|
+				%li
+					%a{ :href => "/?f=#{f[:file_escaped]}", :class => ("selected" if @file == f[:file]) }= f[:name]
+	%section#content
+		%div.mainSettings
+		%div.table
+			%div.header
+				%table
+					%colgroup
+						%col.name
+						%col.fg
+						%col.bg
+						%col.b
 
-			%thead
-				%tr
-					%th.l{ :scope    => "col" } Name
-					%th.c{ :scope    => "col" } FG
-					%th.c{ :scope    => "col" } BG
-					%th.c{ :scope    => "col" } Font Style
-					%th.l{ :scope    => "col" } Scope
-					%th.ctrl{ :scope => "col" }
-	%div.content
-		%table.hidden
-			%colgroup
-				%col.name
-				%col.fg
-				%col.bg
-				%col.b
-				%col.scope
-				%col.ctrl
-			%thead
-				%tr
-					%th.l{ :scope    => "col" } Name
-					%th.c{ :scope    => "col" } FG
-					%th.c{ :scope    => "col" } BG
-					%th.c{ :scope    => "col" } Font Style
-					%th.l{ :scope    => "col" } Scope
-					%th.ctrl{ :scope => "col" }
-			%tbody{ :style => "background-color: #{settings["background"]}; color: #{settings["foreground"]}" }
-
-	%section.footer
-		%button.add.repl Add
+					%thead
+						%tr
+							%th.l{ :scope    => "col" } Name
+							%th.c{ :scope    => "col" } FG
+							%th.c{ :scope    => "col" } BG
+							%th.c{ :scope    => "col" } Font Style
+			%div.content
+				%table.hidden
+					%colgroup
+						%col.name
+						%col.fg
+						%col.bg
+						%col.b
+					%thead
+						%tr
+							%th.l{ :scope    => "col" } Name
+							%th.c{ :scope    => "col" } FG
+							%th.c{ :scope    => "col" } BG
+							%th.c{ :scope    => "col" } Font Style
+					%tbody
+		%div.selected
+			%input{ :name => :scope }
+%section.footer
+	%button.add.repl Add
 
 %script#colorTemplate{ :type => "text/html" }
 	%input.preview{ :style => "background-color: {{rgba}}; color: {{textColor}}", :type => "color", :value => "{{color}}", :name => "color" }
@@ -106,6 +100,8 @@
 
 %script#settingsItemTemplate{ :type => "text/html" }
 	%td.l
+		%span{ :style => "color: {{new ColorModel({color: settings.foreground}).rgba()}}; background-color: {{new ColorModel({color: settings.background}).rgba()}};", :class => "{{settings.fontStyle}}" }
+			{{name}}
 		%input.name{ :value => "{{name}}", :name => "name", :style => "color: {{new ColorModel({color: settings.foreground}).rgba()}}; background-color: {{new ColorModel({color: settings.background}).rgba()}};", :class => "{{settings.fontStyle}}" }
 	%td.c
 		%input.colorwell.fg{ :style => "background-color: {{new ColorModel({color: settings.foreground}).rgba()}}", :name => "fg", :value => "{{settings.foreground}}" }
@@ -115,7 +111,3 @@
 		%input.b{ :type => "checkbox", :name => "bold", :title => "Bold" }
 		%input.i{ :type => "checkbox", :name => "italic", :title => "Italic" }
 		%input.u{ :type => "checkbox", :name => "underline", :title => "Underline" }
-	%td.l
-		%input.scope{ :value => "{{ scope }}", :name => "scope" }
-	%td.c
-		%button.delete Delete

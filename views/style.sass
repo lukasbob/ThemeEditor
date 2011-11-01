@@ -12,6 +12,27 @@ $border_color: #a6a6a6
 @mixin rounded($radius)
 	border-radius: $radius
 
+@mixin full_left($w: 200px)
+	position: absolute
+	left: 0
+	top: 0
+	bottom: 0
+	width: $w
+
+@mixin full_top($h: 50px, $t: 0, $l: 0, $r: 0)
+	position: absolute
+	left: $l
+	right: $r
+	top: $t
+	height: $h
+
+@mixin full_bottom($h: 50px, $b: 0, $l: 0, $r: 0)
+	position: absolute
+	left: $l
+	right: $r
+	bottom: $b
+	height: $h
+
 @mixin full($t: 0, $r: 0, $b: 0, $l: 0)
 	position: absolute
 	top: $t
@@ -100,47 +121,10 @@ input.u
 		text-decoration: underline
 
 body
-	font-family: 'Knockout-HTF30-JuniorWelterwt', Futura
+	font-family: 'Lucida Grande'
 	font-size: 12px
 	line-height: 18px
-
-.select
-	@include gradient(#f5f5f5, #fff)
-	@include rounded(2px)
-	font-size: 14px
-	border: 1px solid $border_color
-	width: 300px
-	line-height: 20px
-	margin: 15px
-	padding: 0 5px
-	float: right
-	position: relative
-
-	label
-		display: inline-block
-		width: 23px
-		border-right: 1px solid $border_color
-
-	select
-		@include ell
-		font-family: 'Knockout-HTF30-JuniorWelterwt', sans-serif
-		-webkit-appearance: none
-		border: 0
-		position: absolute
-		right: 0
-		left: 31px
-		padding: 0 10px 0 3px
-		font-size: 14px
-		height: 20px
-
-	&::after
-		content: "\25BE"
-		color: #666
-		line-height: 20px
-		font-size: 10px
-		position: absolute
-		top: 0
-		right: 3px
+	background: #ddd
 
 header
 	@include gradient(#5b6773, #4d5660)
@@ -181,12 +165,51 @@ header
 .underline
 	text-decoration: underline
 
+.wrapper
+	@include full($t: 50px, $b: $footer_height)
+
+#content
+	@include full($l: 200px)
+
+#sidebar
+	@include full_left
+	ul
+		@include full(10px, 10px, 10px, 10px)
+		background: #fff
+		border: 1px solid $border_color
+		overflow: scroll
+	a
+		display: block
+		text-decoration: none
+		line-height: 2em
+		padding: 0 .5em
+		color: #000
+		&:hover, &:focus
+			background: #ddd
+		&.selected
+			background: #3879d9
+			color: #fff
+
+#content div.selected
+	@include full_bottom($b: 10px, $r: 10px, $h: 27px)
+	input
+		border: 1px solid $border_color
+		padding: 3px 0
+		box-sizing: border-box
+		text-indent: 3px
+		line-height: 19px
+		font-family: menlo
+		width: 100%
+		margin: 0
+
 .table
-	@include full(75px)
+	@include full($t: 70px, $b: 47px, $r: 10px)
+	background: #fff
 	overflow: hidden
+	border: 1px solid $border_color
 
 .content
-	@include full($t: 20px, $b:$footer_height)
+	@include full($t: 20px)
 	overflow-y: scroll
 
 .header
@@ -224,12 +247,15 @@ table.hidden thead
 
 	th
 		@include gradient(#fff, #e5e5e5)
-		border-top: 1px solid $border_color
+		color: #111
 		border-bottom: 1px solid $border_color
 
 	td
 		border-bottom: 1px solid rgba(0,0,0,.02)
 		vertical-align: middle
+	tr:focus td
+		box-shadow: inset #3879d9 0 0 40px
+
 
 	col.b
 		width: 80px
@@ -253,7 +279,9 @@ table.hidden thead
 		padding: 1px 2px
 		@include rounded(2px)
 
-input[name*="name"], input[name*="scope"]
+input[name*="name"], tr span
+	@include ell
+	padding: 1px
 	width: 100%
 	border: 0 none
 	color: inherit
@@ -263,6 +291,16 @@ input[name*="name"], input[name*="scope"]
 	line-height: 18px
 	background-color: transparent
 	text-shadow: rgba(0,0,0,.1) 1px 1px 0
+	display: block
+
+input[name*="name"]
+	display: none
+
+tr.active
+	span
+		display: none
+	input[name*="name"]
+		display: block
 
 .colorpicker
 	position: absolute
@@ -328,7 +366,9 @@ input[name*="name"], input[name*="scope"]
 		text-align: right
 
 fieldset
-	width: 100%
+	@include full_top($t: 10px, $r: 10px)
 	p
+		text-align: right
 		display: inline-block
-		width: 12.5%
+		width: 30%
+		line-height: 25px

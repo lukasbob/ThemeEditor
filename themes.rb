@@ -35,14 +35,14 @@ module Themes
 			end
 			def files
 				themefiles = File.join("../**", "*.tmTheme")
-				Dir.glob(themefiles).map{ |f| CGI::escape(f) }.compact
+				Dir.glob(themefiles).collect{ |f|
+					{
+						:file => f,
+						:file_escaped =>  CGI.escape(f),
+						:name => File.basename(f, ".tmTheme")
+					}
+				}
 			end
-		end
-
-		get '/' do
-			@title = "File listing"
-			@files = files
-			haml :list
 		end
 
 		get '/sass/*.css' do |f|
@@ -50,20 +50,27 @@ module Themes
 			sass f.to_sym
 		end
 
-		# get '/manifest' do
-		# 	content_type "text/cache-manifest"
-		# 	Manifesto.cache :directory => "./public"
-		# end
-
-		get "/t" do
-			@file = params[:f]
-			@plist = Nokogiri::PList(open(@file))
+		get "/" do
 			@files = files
-			@title = "Details for #{@plist["name"]}"
-			haml :show
+			if params[:f]
+				@file = CGI.unescape params[:f]
+				@plist = Nokogiri::PList(open(@file))
+				@title = "Theme: #{@plist["name"]}"
+				if params[:o] == "json"
+					content_type :json
+					@plist.to_json
+				else
+					haml :show
+				end
+			else
+				@title = "File listing"
+				@files = files
+				haml :list
+			end
+
 		end
 
-		post "/t" do
+		post "/" do
 			file = params[:f]
 			content_type :json
 			plist = JSON.parse(request.body.read.force_encoding("UTF-8"))
