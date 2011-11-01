@@ -1,0 +1,121 @@
+- settings = @plist["settings"][0]["settings"]
+
+%script
+	window.plist = #{@plist.to_json};
+%div.select
+	%label{ :for => "f"} File
+	%select#f{ :name => "f" }
+		- @files.each do |f|
+			%option{ :value => f, :selected => CGI::unescape(f) == @file }= CGI::unescape f
+		end
+%header
+	%h1= @plist["name"]
+	%p.author by #{@plist["author"]}
+%div.table
+	%div.header
+		%table
+			%colgroup
+				%col.name
+				%col.fg
+				%col.bg
+				%col.b
+				%col.scope
+				%col.ctrl
+
+			%thead
+				%tr
+					%th.l{ :scope    => "col" } Name
+					%th.c{ :scope    => "col" } FG
+					%th.c{ :scope    => "col" } BG
+					%th.c{ :scope    => "col" } Font Style
+					%th.l{ :scope    => "col" } Scope
+					%th.ctrl{ :scope => "col" }
+	%div.content
+		%table.hidden
+			%colgroup
+				%col.name
+				%col.fg
+				%col.bg
+				%col.b
+				%col.scope
+				%col.ctrl
+			%thead
+				%tr
+					%th.l{ :scope    => "col" } Name
+					%th.c{ :scope    => "col" } FG
+					%th.c{ :scope    => "col" } BG
+					%th.c{ :scope    => "col" } Font Style
+					%th.l{ :scope    => "col" } Scope
+					%th.ctrl{ :scope => "col" }
+			%tbody{ :style => "background-color: #{settings["background"]}; color: #{settings["foreground"]}" }
+
+	%section.footer
+		%button.add.repl Add
+
+%script#colorTemplate{ :type => "text/html" }
+	%input.preview{ :style => "background-color: {{rgba}}; color: {{textColor}}", :type => "color", :value => "{{color}}", :name => "color" }
+	%table
+		%tr
+			%th{ :scope => "row" }
+				%label{ :for => "red"} Red:
+			%td
+				%input#red{ :type => "range", :min => 0, :max => 255, :value => "{{red}}", :name => "red" }
+				%input#red{ :type => "number", :min => 0, :max => 255, :value => "{{red}}", :name => "red" }
+		%tr
+			%th{ :scope => "row" }
+				%label{ :for => "blue"} Blue:
+			%td
+				%input#blue{ :type => "range", :min => 0, :max => 255, :value => "{{blue}}", :name => "blue" }
+				%input#blue{ :type => "number", :min => 0, :max => 255, :value => "{{blue}}", :name => "blue" }
+
+		%tr
+			%th{ :scope => "row" }
+				%label{ :for => "green"} Green:
+			%td
+				%input#green{ :type => "range", :min => 0, :max => 255, :value => "{{green}}", :name => "green" }
+				%input#green{ :type => "number", :min => 0, :max => 255, :value => "{{green}}", :name => "green" }
+		%tr
+			%th{ :scope => "row" }
+				%label{ :for => "alpha"} Opacity:
+			%td
+				%input#alpha{ :type => "range", :min => 0, :max => 100, :value => "{{alpha}}", :name => "alpha" }
+				%input#alpha{ :type => "number", :min => 0, :max => 100, :value => "{{alpha}}", :name => "alpha" }
+	%p.commit
+		%button.cancel Cancel
+		%button.ok OK
+
+%script#settingsTemplate{ :type => "text/html" }
+	%p
+		%label{ :for => "main_fg" } Foreground:
+		%input.colorwell.fg#main_fg{ :style => "background-color: {{new ColorModel({color: settings.foreground}).rgba()}}", :name => "fg", :value => "{{settings.foreground}}" }
+	%p
+		%label{ :for => "main_bg" } Background:
+		%input.colorwell.fg#main_bg{ :style => "background-color: {{new ColorModel({color: settings.background}).rgba()}}", :name => "bg", :value => "{{settings.background}}" }
+	%p
+		%label{ :for => "main_caret" } Caret:
+		%input.colorwell.caret#main_caret{ :style => "background-color: {{new ColorModel({color: settings.caret}).rgba()}}", :name => "caret", :value => "{{settings.caret}}" }
+	%p
+		%label{ :for => "main_selection" } Selection:
+		%input.colorwell.selection#main_selection{ :style => "background-color: {{new ColorModel({color: settings.selection}).rgba()}}", :name => "selection", :value => "{{settings.selection}}" }
+	%p
+		%label{ :for => "main_invisibles" } Invisibles:
+		%input.colorwell.invisibles#main_invisibles{ :style => "background-color: {{new ColorModel({color: settings.invisibles}).rgba()}}", :name => "invisibles", :value => "{{settings.invisibles}}" }
+	%p
+		%label{ :for => "main_lineHighlight" } Line Highlight:
+		%input.colorwell.lineHighlight#main_lineHighlight{ :style => "background-color: {{new ColorModel({color: settings.lineHighlight}).rgba()}}", :name => "lineHighlight", :value => "{{settings.lineHighlight}}" }
+
+%script#settingsItemTemplate{ :type => "text/html" }
+	%td.l
+		%input.name{ :value => "{{name}}", :name => "name", :style => "color: {{new ColorModel({color: settings.foreground}).rgba()}}; background-color: {{new ColorModel({color: settings.background}).rgba()}};", :class => "{{settings.fontStyle}}" }
+	%td.c
+		%input.colorwell.fg{ :style => "background-color: {{new ColorModel({color: settings.foreground}).rgba()}}", :name => "fg", :value => "{{settings.foreground}}" }
+	%td.c
+		%input.colorwell.bg{ :style => "background-color: {{new ColorModel({color: settings.background}).rgba()}}", :name => "bg", :value => "{{settings.background}}" }
+	%td.fs
+		%input.b{ :type => "checkbox", :name => "bold", :title => "Bold" }
+		%input.i{ :type => "checkbox", :name => "italic", :title => "Italic" }
+		%input.u{ :type => "checkbox", :name => "underline", :title => "Underline" }
+	%td.l
+		%input.scope{ :value => "{{ scope }}", :name => "scope" }
+	%td.c
+		%button.delete Delete

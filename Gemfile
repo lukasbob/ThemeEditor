@@ -1,0 +1,10 @@
+source :rubygems
+gem 'sinatra'
+gem 'haml'
+gem 'coffee-script'
+gem 'sass'
+gem 'nokogiri'
+gem 'nokogiri-plist'
+gem 'json'
+gem 'manifesto'
+gem 'rack-coffee'

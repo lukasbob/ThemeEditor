@@ -1,0 +1,14 @@
+!!! 5
+%html
+	%head
+		%link{ :href => "/css/reset.css", :rel => "stylesheet" }
+		%link{ :href => "/sass/style.css", :rel => "stylesheet" }
+		%title= @title
+	%body
+		= yield
+	%script{ :src => "/lib/jquery.js" }
+	%script{ :src => "/lib/underscore.js" }
+	%script{ :src => "/lib/backbone.js" }
+	%script{ :src => "/lib/backbone-relational.js" }
+	%script{ :src => "/src/script.js" }
+
