@@ -75,7 +75,7 @@ module Themes
 			content_type :json
 			plist = JSON.parse(request.body.read.force_encoding("UTF-8"))
 			xml = build_plist(plist.to_plist_xml)
-			File.open(file, 'r+') { |f| f.write(xml) }
+			File.open(file, 'w') { |f| f.write(xml) }
 			true.to_json
 		end
 	end

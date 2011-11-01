@@ -1,4 +1,4 @@
-$ ->
+	$ ->
 
  ##########################################################################
  #                                                                        #
@@ -62,10 +62,6 @@ $ ->
 ###############################################################################
 
 	window.Settings = class Settings extends Backbone.RelationalModel
-		defaults:
-			foreground: ""
-			background: ""
-			fontStyle: ""
 
 		initialize: -> @bind "change", -> @get("rule").change()
 
@@ -84,9 +80,9 @@ $ ->
 			'click button.add': 'addRule'
 
 		initialize: ->
-			@model.bind 'add', (rule) =>
-				@renderRule(rule)
-				.$("input.name").focus()
+			@model.get("settings").bind 'add', (rule) =>
+				@renderRule(rule).activate()
+
 
 
 		render: =>
@@ -109,7 +105,12 @@ $ ->
 		renderMainSettings: (rule) ->
 			@$(".mainSettings").html((new SettingsView { model: rule }).render().el)
 
-		addRule: => @model.add new Rule
+		addRule: =>
+			@model.get("settings").add new Rule
+				name: "Unnamed style"
+				scope: "Unnamed scope selector"
+				settings: {}
+
 
 ###############################################################################
 
@@ -128,7 +129,7 @@ $ ->
 			"change .fg"               : "fg"
 			"change .bg"               : "bg"
 			"click .delete"            : "delete"
-			"click .colorwell"         : "showColorPicker"
+			"click .colorwell input"   : "showColorPicker"
 			"click"                    : "focus"
 			"focus"                    : "select"
 			'dblclick span'            : "activate"
@@ -139,6 +140,7 @@ $ ->
 
 		initialize: ->
 			@model.get("settings").bind "change", => @render()
+			@model.bind "change:name", => @render()
 
 		render: ->
 			viewDefaults =
@@ -149,9 +151,9 @@ $ ->
 			@el.innerHTML = content
 			$(@el).attr tabindex: 0
 			fontStyle = @model.get("settings").get "fontStyle"
-			@$('.b').prop "checked", fontStyle.indexOf("bold") > -1
-			@$('.i').prop "checked", fontStyle.indexOf("italic") > -1
-			@$('.u').prop "checked", fontStyle.indexOf("underline") > -1
+			@$('.b').prop "checked", fontStyle?.indexOf("bold") > -1
+			@$('.i').prop "checked", fontStyle?.indexOf("italic") > -1
+			@$('.u').prop "checked", fontStyle?.indexOf("underline") > -1
 			@
 
 		toggleFontStyle: (style, add) =>
@@ -171,10 +173,11 @@ $ ->
 			@remove()
 
 		showColorPicker: (e) =>
-			window.colorPicker.model = new ColorModel { color: e.currentTarget.value }
-			window.colorPicker.options.anchor = e.currentTarget
+			cell = e.currentTarget
+			window.colorPicker.model = new ColorModel { color: cell.value }
+			window.colorPicker.options.anchor = cell
 			window.colorPicker.render().setPosition().bind "commit", (color) =>
-				$(e.currentTarget).val(color).change()
+				$(cell).val(color).change()
 
 		activate: => $(@el).addClass("active").find('input[name*="name"]').focus()
 
@@ -193,14 +196,15 @@ $ ->
 				e.preventDefault()
 				@delete() if confirm "Delete this rule?"
 
+			if (e.keyCode is 13) and $(@el).is(":focus")
+				@activate()
+
 
 
 		bold: (e)      => @toggleFontStyle "bold", e.currentTarget.checked
 		italic: (e)    => @toggleFontStyle "italic", e.currentTarget.checked
 		underline: (e) => @toggleFontStyle "underline", e.currentTarget.checked
-		name: (e)      =>
-			@model.set "name": e.currentTarget.value
-			@render()
+		name: (e)      => @model.set "name": e.currentTarget.value
 		fg: (e)        =>	@model.get("settings").set "foreground": e.currentTarget.value
 		bg: (e)        =>	@model.get("settings").set "background": e.currentTarget.value
 
@@ -213,7 +217,7 @@ $ ->
 		template: _.template($("#settingsTemplate").html())
 
 		events:
-			"click .colorwell": "showColorPicker"
+			"click .colorwell input"     : "showColorPicker"
 			"change #main_fg"            : "fg"
 			"change #main_bg"            : "bg"
 			"change #main_caret"         : "caret"
@@ -271,7 +275,10 @@ $ ->
 			if output.toString().length is 1 then "0#{output}" else "#{output}"
 
 		rgba: =>
-			"rgba(#{@get "red"},#{@get "green"},#{@get "blue"},#{parseInt(@get("alpha"), 10)/100})"
+			if @get("color") is "#ffffff00"
+				""
+			else
+				"rgba(#{@get "red"},#{@get "green"},#{@get "blue"},#{parseInt(@get("alpha"), 10)/100})"
 
 		hex:  =>
 			"##{@toHex @get("red")}#{@toHex @get("green")}#{@toHex @get("blue")}#{@alpha @get("alpha")}"
@@ -379,15 +386,24 @@ $ ->
 		setPosition: =>
 			pos       = $(@options.anchor).offset()
 			winHeight = $(window).height()
-			elHeight  = $(@el).height()
-			hOffset   = elHeight / 2
+			elHeight  = $(@el).outerHeight()
+			elWidth   = $(@el).outerWidth()
+			hOffset   = elHeight / 2 - $(@options.anchor).outerHeight() / 2
 			wOffset   = $(@options.anchor).width()
 			posTop    = pos.top - hOffset
-			posLeft   = pos.left + wOffset
+			posLeft   = pos.left - elWidth - 5
+			orgPosTop = posTop
 
 			# Adjust top position to stay on screen.
 			posTop    = 10 if posTop < 10
 			posTop    = winHeight - elHeight - 10 if elHeight + posTop > winHeight
+
+			# Move the triangular pointer if there has beenany adjustment in top position.
+			hAdjust =  orgPosTop - posTop
+			if hAdjust isnt 0
+				pointerTopMargin = parseInt @$('.tr').css("margin-top").split("px")[0], 10
+				@$('.tr').css
+					marginTop: hAdjust + pointerTopMargin
 
 			$(@el).css
 				top: posTop
