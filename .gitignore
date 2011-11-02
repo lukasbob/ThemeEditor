@@ -2,3 +2,4 @@ Gemfile.lock
 tmp/restart.txt
 .sass-cache/*
 .rvmrc
+.DS_Store
