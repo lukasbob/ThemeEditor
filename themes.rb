@@ -11,6 +11,10 @@ require 'rack/coffee'
 module Themes
 	class Application < Sinatra::Base
 
+		set :file_root, "~/Library/Application Support/Sublime Text 2/Packages"
+		set :haml, :format => :html5, :ugly => true
+		set :sass, :style => :compact
+
 		before do
 			content_type :html, 'charset' => 'utf-8'
 		end
@@ -20,10 +24,8 @@ module Themes
 			:urls => '/src'
 		}
 
-		set :haml, :format => :html5, :ugly => true
-		set :sass, :style => :compact
-
 		helpers do
+
 			def build_plist(fragment)
 				builder = Nokogiri::XML::Builder.new(:encoding => 'UTF-8') do |xml|
 					xml.doc.create_internal_subset("plist",
@@ -33,8 +35,9 @@ module Themes
 				end
 				builder.to_xml
 			end
+
 			def files
-				themefiles = File.join("../**", "*.tmTheme")
+				themefiles = File.join(File.expand_path(settings.file_root), "./**", "*.tmTheme")
 				Dir.glob(themefiles).collect{ |f|
 					{
 						:file => f,
@@ -43,6 +46,7 @@ module Themes
 					}
 				}
 			end
+
 		end
 
 		get '/sass/*.css' do |f|
@@ -67,7 +71,6 @@ module Themes
 				@files = files
 				haml :list
 			end
-
 		end
 
 		post "/" do
