@@ -72,18 +72,6 @@ button
 	&:active
 		@include gradient(#b0b0b0, #a5a5a5)
 
-button.repl
-	text-indent: -999em
-	position: relative
-	&::after
-		font-family: helvetica
-		position: absolute
-		left: 0
-		top: 0
-		text-align: center
-		font-size: 14px
-		text-indent: 0
-
 td.fs
 	font-size: 0
 	text-align: center
@@ -282,17 +270,11 @@ table.hidden thead
 	col.fg, col.bg
 		width: 25px
 
-	col.ctrl
-		width: 50px
-
 	.c
 		text-align: center
 
 	.l
 		text-align: left
-
-	.r
-		text-align: right
 
 input[name*="name"], tr span
 	@include ell
@@ -328,6 +310,17 @@ tr.active
 	box-shadow: rgba(0,0,0,.4) 0 5px 10px
 	background: #fff
 	line-height: 2em
+	opacity: 1
+	-webkit-transform: scale(1)
+	-webkit-transition-property: opacity, -webkit-transform
+	-webkit-transition-duration: .2s
+	-webkit-transition-timing-function: linear
+	&.hide
+		opacity: 0
+		-webkit-transform: scale(1.1) translate(-	3em, 0)
+		-webkit-transition-property: opacity, -webkit-transform
+		-webkit-transition-duration: .2s
+		-webkit-transition-timing-function: linear
 	.tr
 		width: 15px
 		height: 30px

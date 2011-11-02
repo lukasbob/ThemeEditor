@@ -130,6 +130,7 @@
 			"change .bg"               : "bg"
 			"click .delete"            : "delete"
 			"click .colorwell input"   : "showColorPicker"
+			"focus .colorwell input"   : "showColorPicker"
 			"click"                    : "focus"
 			"focus"                    : "select"
 			'dblclick span'            : "activate"
@@ -160,7 +161,7 @@
 			if add then @addFontStyle(style) else @removeFontStyle(style)
 
 		addFontStyle: (style) =>
-			fontStyle = @model.get("settings").get("fontStyle").split(" ")
+			fontStyle = @model.get("settings").get("fontStyle")?.split(" ") or []
 			fontStyle.push style
 			@model.get("settings").set fontStyle: $.trim fontStyle.join(" ")
 
@@ -176,7 +177,7 @@
 			cell = e.currentTarget
 			window.colorPicker.model = new ColorModel { color: cell.value }
 			window.colorPicker.options.anchor = cell
-			window.colorPicker.render().setPosition().bind "commit", (color) =>
+			window.colorPicker.render().show().bind "commit", (color) =>
 				$(cell).val(color).change()
 
 		activate: => $(@el).addClass("active").find('input[name*="name"]').focus()
@@ -218,6 +219,7 @@
 
 		events:
 			"click .colorwell input"     : "showColorPicker"
+			"focus .colorwell input"     : "showColorPicker"
 			"change #main_fg"            : "fg"
 			"change #main_bg"            : "bg"
 			"change #main_caret"         : "caret"
@@ -236,7 +238,7 @@
 		showColorPicker: (e) =>
 			window.colorPicker.model = new ColorModel { color: e.currentTarget.value }
 			window.colorPicker.options.anchor = e.currentTarget
-			window.colorPicker.render().setPosition().bind "commit", (color) =>
+			window.colorPicker.render().show().bind "commit", (color) =>
 				$(e.currentTarget).val(color).change()
 
 		fg: (e)            =>	@model.get("settings").set "foreground": e.currentTarget.value
@@ -419,9 +421,13 @@
 			@trigger "commit", @model.get "color"
 			@hide()
 
+		show: =>
+			@setPosition()
+			$(@el).removeClass('hide')
 		hide: =>
 			@model.destroy()
-			$(@el).fadeOut 200, -> $(@el).empty()
+			$(@el).addClass('hide')
+			# $(@el).fadeOut 200, -> $(@el).empty()
 
 ###############################################################################
 
