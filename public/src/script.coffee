@@ -33,15 +33,25 @@ $ ->
 			@bind "change", @save
 			@get("settings").bind "change", @save
 			@get("settings").bind "remove", @save
+			statusModel.set
+				thinking: no
+				text: "#{@get("name")} is ready!"
 
 		save: =>
+			statusModel.set
+				thinking: yes
+				text: "Saving..."
 			$.ajax
 				url: document.location.href
 				type: 'POST'
 				dataType: 'json'
 				data: JSON.stringify @toJSON()
 				contentType: 'application/json; charset=utf-8'
-				success: (data) -> $(window).trigger "save"
+				success: (data) ->
+					statusModel.set
+						thinking: no
+						text: "Saved #{data}"
+					$(window).trigger "save"
 
 ###############################################################################
 
@@ -328,8 +338,11 @@ $ ->
 			"click a": "select"
 
 		select: (e) =>
-
+			statusModel.set
+				thinking: yes
+				text: "Loading #{$(e.currentTarget).text()}"
 			$.getJSON "#{e.currentTarget.href}&o=json", (data) =>
+
 				window.myList = new Plist data
 				window.rules.model = myList
 				window.rules.render()
@@ -343,6 +356,30 @@ $ ->
 				$(e.currentTarget).addClass("selected")
 			e.preventDefault()
 
+###############################################################################
+
+	class StatusView extends Backbone.View
+
+		template: _.template($("#statusTemplate").html())
+
+		className: "status"
+
+		initialize: ->
+			@model.bind "change:thinking", @setThinking
+			@model.bind "change:text", @updateText
+
+		render: ->
+			content = @template @model.toJSON()
+			@el.innerHTML = content
+			@
+
+		setThinking: (model, thinking) =>
+			if thinking
+				$(@el).addClass('thinking')
+			else
+				$(@el).removeClass('thinking')
+
+		updateText: (model, text) => @$('.text').text(text)
 
 ###############################################################################
 
@@ -434,6 +471,8 @@ $ ->
 
 	$('tbody').hide()
 
+	window.statusModel = new Backbone.Model(text: "Loading...", thinking: yes)
+
 	window.myList = new Plist plist
 
 	window.rules = new RulesView({ model: myList }).render()
@@ -441,6 +480,9 @@ $ ->
 	window.header = new HeaderView({ model: myList }).render()
 
 	window.active = new ActiveView
+
+
+	$(window.header.el).append(new StatusView(model: window.statusModel).render().el)
 
 	new SidebarView
 

@@ -1,12 +1,11 @@
-require 'sinatra'
-require 'haml'
 require 'coffee-script'
-require 'sass'
+require 'haml'
+require 'json'
 require 'nokogiri'
 require 'nokogiri-plist'
-require 'json'
-require 'manifesto'
 require 'rack/coffee'
+require 'sass'
+require 'sinatra'
 
 module Themes
 	class Application < Sinatra::Base
@@ -26,12 +25,12 @@ module Themes
 
 		helpers do
 
-			def build_plist(fragment)
+			def build_plist(object)
 				builder = Nokogiri::XML::Builder.new(:encoding => 'UTF-8') do |xml|
 					xml.doc.create_internal_subset("plist",
-						"-//Apple Computer//DTD PLIST 1.0//EN",
+						"-//Apple//DTD PLIST 1.0//EN",
 						"http://www.apple.com/DTDs/PropertyList-1.0.dtd")
-					xml.plist(:version => "1.0") { xml << fragment }
+					xml.plist(:version => "1.0") { xml << object.to_plist_xml }
 				end
 				builder.to_xml
 			end
@@ -77,9 +76,8 @@ module Themes
 			file = params[:f]
 			content_type :json
 			plist = JSON.parse(request.body.read.force_encoding("UTF-8"))
-			xml = build_plist(plist.to_plist_xml)
-			File.open(file, 'w') { |f| f.write(xml) }
-			true.to_json
+			File.open(file, 'w') { |f| f.write(build_plist(plist)) }
+			File.mtime(file).strftime("%d-%m-%Y %H:%M:%S").to_json
 		end
 	end
 end

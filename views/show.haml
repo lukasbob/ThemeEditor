@@ -4,6 +4,7 @@
 %header
 	%h1= @plist["name"]
 	%p.author by #{@plist["author"]}
+
 %div.wrapper
 	%section#sidebar
 		%ul
@@ -104,6 +105,18 @@
 		%label{ :for => "main_lineHighlight" } Line Highlight:
 		%span.colorwell
 			%input.lineHighlight#main_lineHighlight{ :style => "background-color: {{new ColorModel({color: settings.lineHighlight}).rgba()}}", :name => "lineHighlight", :value => "{{settings.lineHighlight}}" }
+
+%script#statusTemplate{ :type => "text/html" }
+	%div.spinner
+		%div.bar1
+		%div.bar2
+		%div.bar3
+		%div.bar4
+		%div.bar5
+		%div.bar6
+		%div.bar7
+		%div.bar8
+	%span.text {{text}}
 
 %script#settingsItemTemplate{ :type => "text/html" }
 	%td.l
