@@ -159,7 +159,8 @@ $ ->
 				name: "No name"
 
 			content = @template _.extend viewDefaults, @model.toJSON()
-			@el.innerHTML = content
+
+			$(@el).empty().html content
 			$(@el).attr tabindex: 0
 			fontStyle = @model.get("settings").get "fontStyle"
 			@$('.b').prop "checked", fontStyle?.indexOf("bold") > -1
@@ -242,7 +243,7 @@ $ ->
 
 		render: ->
 			content = @template @model.toJSON()
-			@el.innerHTML = content
+			$(@el).empty().html content
 			@
 
 		showColorPicker: (e) =>
@@ -370,7 +371,7 @@ $ ->
 
 		render: ->
 			content = @template @model.toJSON()
-			@el.innerHTML = content
+			$(@el).empty().html content
 			@
 
 		setThinking: (model, thinking) =>
@@ -395,6 +396,9 @@ $ ->
 			"click button.cancel" : "hide"
 
 		render: ->
+			# Make sure there is nothing bound to the commit event.
+			@unbind "commit"
+
 			@model.bind "change:color", @renderColor
 			@model.bind "change:red", @renderRangeControls
 			@model.bind "change:green", @renderRangeControls
@@ -406,7 +410,7 @@ $ ->
 				textColor: @model.bestTextColor()
 			}
 
-			@el.innerHTML = content
+			$(@el).empty().html content
 			@
 
 		renderColor: =>
