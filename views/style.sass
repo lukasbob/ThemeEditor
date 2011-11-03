@@ -82,7 +82,6 @@ ol.sgm
 
 input[type=checkbox]
 	-webkit-appearance: none
-	-moz-appearance: none
 	display: inline-block
 	width: 21px
 	height: 17px
@@ -276,7 +275,7 @@ table.hidden thead
 	.l
 		text-align: left
 
-input[name*="name"], tr span
+input[name*="name"], tr span.name
 	@include ell
 	padding: 1px
 	width: 100%
@@ -294,7 +293,7 @@ input[name*="name"]
 	display: none
 
 tr.active
-	span
+	span.name
 		display: none
 	input[name*="name"]
 		display: block
@@ -315,12 +314,20 @@ tr.active
 	-webkit-transition-property: opacity, -webkit-transform
 	-webkit-transition-duration: .2s
 	-webkit-transition-timing-function: linear
+	-moz-transform: scale(1)
+	-moz-transition-property: opacity, -webkit-transform
+	-moz-transition-duration: .2s
+	-moz-transition-timing-function: linear
 	&.hide
 		opacity: 0
 		-webkit-transform: scale(1.1) translate(-3em, 0)
 		-webkit-transition-property: opacity, -webkit-transform
 		-webkit-transition-duration: .2s
 		-webkit-transition-timing-function: linear
+		-moz-transform: scale(1.1) translate(-3em, 0)
+		-moz-transition-property: opacity, -webkit-transform
+		-moz-transition-duration: .2s
+		-moz-transition-timing-function: linear
 	.tr
 		width: 15px
 		height: 30px
@@ -410,6 +417,11 @@ fieldset
 	100%
 		-webkit-transform: scale(0.15) rotate(360deg)
 
+@-moz-keyframes rotateThis
+	0%
+		-moz-transform: scale(0.15) rotate(0deg)
+	100%
+		-moz-transform: scale(0.15) rotate(360deg)
 .status
 	background: rgba(0,0,0,.7)
 	box-shadow: inset rgba(0,0,0,.2) 0 2px 5px
@@ -438,6 +450,11 @@ fieldset
 		-webkit-animation-duration: 1.5s
 		-webkit-animation-iteration-count: infinite
 		-webkit-animation-timing-function: linear
+		-moz-transform: scale(0.15)
+		-moz-animation-name: rotateThis
+		-moz-animation-duration: 1.5s
+		-moz-animation-iteration-count: infinite
+		-moz-animation-timing-function: linear
 		div
 			width: 15px
 			height: 30px
@@ -447,25 +464,33 @@ fieldset
 			left: 45px
 		.bar1
 			-webkit-transform: rotate(0deg) translate(0, -40px)
+			-moz-transform: rotate(0deg) translate(0, -40px)
 			opacity: 0.12
 		.bar2
 			-webkit-transform: rotate(45deg) translate(0, -40px)
+			-moz-transform: rotate(45deg) translate(0, -40px)
 			opacity: 0.25
 		.bar3
 			-webkit-transform: rotate(90deg) translate(0, -40px)
+			-moz-transform: rotate(90deg) translate(0, -40px)
 			opacity: 0.37
 		.bar4
 			-webkit-transform: rotate(135deg) translate(0, -40px)
+			-moz-transform: rotate(135deg) translate(0, -40px)
 			opacity: 0.50
 		.bar5
 			-webkit-transform: rotate(180deg) translate(0, -40px)
+			-moz-transform: rotate(180deg) translate(0, -40px)
 			opacity: 0.62
 		.bar6
 			-webkit-transform: rotate(225deg) translate(0, -40px)
+			-moz-transform: rotate(225deg) translate(0, -40px)
 			opacity: 0.75
 		.bar7
 			-webkit-transform: rotate(270deg) translate(0, -40px)
+			-moz-transform: rotate(270deg) translate(0, -40px)
 			opacity: 0.87
 		.bar8
 			-webkit-transform: rotate(315deg) translate(0, -40px)
+			-moz-transform: rotate(315deg) translate(0, -40px)
 			opacity: 1
