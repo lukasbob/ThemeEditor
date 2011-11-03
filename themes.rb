@@ -6,6 +6,8 @@ require 'nokogiri-plist'
 require 'rack/coffee'
 require 'sass'
 require 'sinatra'
+require './partials'
+
 
 module Themes
 	class Application < Sinatra::Base
@@ -22,6 +24,8 @@ module Themes
 			:root => 'public',
 			:urls => '/src'
 		}
+
+		helpers Sinatra::Partials
 
 		helpers do
 

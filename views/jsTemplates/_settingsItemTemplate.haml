@@ -1,0 +1,19 @@
+%script#settingsItemTemplate{ :type => "text/html" }
+	%td.l
+		%span.name{ :style => "color: {{new ColorModel({color: settings.foreground}).rgba()}}; background-color: {{new ColorModel({color: settings.background}).rgba()}};", :class => "{{settings.fontStyle}}" }
+			{{name}}
+		%input.name{ :value => "{{name}}", :name => "name", :style => "color: {{new ColorModel({color: settings.foreground}).rgba()}}; background-color: {{new ColorModel({color: settings.background}).rgba()}};", :class => "{{settings.fontStyle}}" }
+	%td.c
+		%span.colorwell
+			%input.fg{ :style => "background-color: {{new ColorModel({color: settings.foreground}).rgba()}}", :name => "fg", :value => "{{settings.foreground}}" }
+	%td.c
+		%span.colorwell
+			%input.bg{ :style => "background-color: {{new ColorModel({color: settings.background}).rgba()}}", :name => "bg", :value => "{{settings.background}}" }
+	%td.fs
+		%ol.sgm
+			%li
+				%input.b{ :type => "checkbox", :name => "bold", :title => "Bold" }
+			%li
+				%input.i{ :type => "checkbox", :name => "italic", :title => "Italic" }
+			%li
+				%input.u{ :type => "checkbox", :name => "underline", :title => "Underline" }

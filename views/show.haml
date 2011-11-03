@@ -24,10 +24,10 @@
 
 					%thead
 						%tr
-							%th.l{ :scope    => "col" } Name
-							%th.c{ :scope    => "col" } FG
-							%th.c{ :scope    => "col" } BG
-							%th.c{ :scope    => "col" } Font Style
+							%th.l{ :scope => "col" } Name
+							%th.c{ :scope => "col" } FG
+							%th.c{ :scope => "col" } BG
+							%th.c{ :scope => "col" } Font Style
 			%div.content
 				%table.hidden
 					%colgroup
@@ -37,103 +37,19 @@
 						%col.b
 					%thead
 						%tr
-							%th.l{ :scope    => "col" } Name
-							%th.c{ :scope    => "col" } FG
-							%th.c{ :scope    => "col" } BG
-							%th.c{ :scope    => "col" } Font Style
+							%th.l{ :scope => "col" } Name
+							%th.c{ :scope => "col" } FG
+							%th.c{ :scope => "col" } BG
+							%th.c{ :scope => "col" } Font Style
 					%tbody
 		%div.selected
 			%input{ :name => :scope }
 			%button.add Add
 
-%script#colorTemplate{ :type => "text/html" }
-	%input.preview{ :style => "background-color: {{rgba}}; color: {{textColor}}", :type => "color", :value => "{{color}}", :name => "color" }
-	%table
-		%tr
-			%th{ :scope => "row" }
-				%label{ :for => "red"} Red:
-			%td
-				%input#red{ :type => "range", :min => 0, :max => 255, :value => "{{red}}", :name => "red" }
-				%input#red{ :type => "number", :min => 0, :max => 255, :value => "{{red}}", :name => "red" }
-		%tr
-			%th{ :scope => "row" }
-				%label{ :for => "green"} Green:
-			%td
-				%input#green{ :type => "range", :min => 0, :max => 255, :value => "{{green}}", :name => "green" }
-				%input#green{ :type => "number", :min => 0, :max => 255, :value => "{{green}}", :name => "green" }
-		%tr
-			%th{ :scope => "row" }
-				%label{ :for => "blue"} Blue:
-			%td
-				%input#blue{ :type => "range", :min => 0, :max => 255, :value => "{{blue}}", :name => "blue" }
-				%input#blue{ :type => "number", :min => 0, :max => 255, :value => "{{blue}}", :name => "blue" }
+= partial("jsTemplates/colorTemplate")
 
-		%tr
-			%th{ :scope => "row" }
-				%label{ :for => "alpha"} Opacity:
-			%td
-				%input#alpha{ :type => "range", :min => 0, :max => 100, :value => "{{alpha}}", :name => "alpha" }
-				%input#alpha{ :type => "number", :min => 0, :max => 100, :value => "{{alpha}}", :name => "alpha" }
-	%p.commit
-		%button.cancel Cancel
-		%button.ok OK
-	%span.tr
-		%span
+= partial("jsTemplates/settingsTemplate")
 
-%script#settingsTemplate{ :type => "text/html" }
-	%p
-		%label{ :for => "main_fg" } Foreground:
-		%span.colorwell
-			%input.fg#main_fg{ :style => "background-color: {{new ColorModel({color: settings.foreground}).rgba()}}", :name => "fg", :value => "{{settings.foreground}}" }
-	%p
-		%label{ :for => "main_bg" } Background:
-		%span.colorwell
-			%input.fg#main_bg{ :style => "background-color: {{new ColorModel({color: settings.background}).rgba()}}", :name => "bg", :value => "{{settings.background}}" }
-	%p
-		%label{ :for => "main_caret" } Caret:
-		%span.colorwell
-			%input.caret#main_caret{ :style => "background-color: {{new ColorModel({color: settings.caret}).rgba()}}", :name => "caret", :value => "{{settings.caret}}" }
-	%p
-		%label{ :for => "main_selection" } Selection:
-		%span.colorwell
-			%input.selection#main_selection{ :style => "background-color: {{new ColorModel({color: settings.selection}).rgba()}}", :name => "selection", :value => "{{settings.selection}}" }
-	%p
-		%label{ :for => "main_invisibles" } Invisibles:
-		%span.colorwell
-			%input.invisibles#main_invisibles{ :style => "background-color: {{new ColorModel({color: settings.invisibles}).rgba()}}", :name => "invisibles", :value => "{{settings.invisibles}}" }
-	%p
-		%label{ :for => "main_lineHighlight" } Line Highlight:
-		%span.colorwell
-			%input.lineHighlight#main_lineHighlight{ :style => "background-color: {{new ColorModel({color: settings.lineHighlight}).rgba()}}", :name => "lineHighlight", :value => "{{settings.lineHighlight}}" }
+= partial("jsTemplates/statusTemplate")
 
-%script#statusTemplate{ :type => "text/html" }
-	%div.spinner
-		%div.bar1
-		%div.bar2
-		%div.bar3
-		%div.bar4
-		%div.bar5
-		%div.bar6
-		%div.bar7
-		%div.bar8
-	%span.text {{text}}
-
-%script#settingsItemTemplate{ :type => "text/html" }
-	%td.l
-		%span.name{ :style => "color: {{new ColorModel({color: settings.foreground}).rgba()}}; background-color: {{new ColorModel({color: settings.background}).rgba()}};", :class => "{{settings.fontStyle}}" }
-			{{name}}
-		%input.name{ :value => "{{name}}", :name => "name", :style => "color: {{new ColorModel({color: settings.foreground}).rgba()}}; background-color: {{new ColorModel({color: settings.background}).rgba()}};", :class => "{{settings.fontStyle}}" }
-	%td.c
-		%span.colorwell
-			%input.fg{ :style => "background-color: {{new ColorModel({color: settings.foreground}).rgba()}}", :name => "fg", :value => "{{settings.foreground}}" }
-	%td.c
-		%span.colorwell
-			%input.bg{ :style => "background-color: {{new ColorModel({color: settings.background}).rgba()}}", :name => "bg", :value => "{{settings.background}}" }
-	%td.fs
-		%ol.sgm
-			%li
-				%input.b{ :type => "checkbox", :name => "bold", :title => "Bold" }
-			%li
-				%input.i{ :type => "checkbox", :name => "italic", :title => "Italic" }
-			%li
-				%input.u{ :type => "checkbox", :name => "underline", :title => "Underline" }
+= partial("jsTemplates/settingsItemTemplate")

@@ -1,0 +1,33 @@
+%script#colorTemplate{ :type => "text/html" }
+	%input.preview{ :style => "background-color: {{rgba}}; color: {{textColor}}", :type => "color", :value => "{{color}}", :name => "color" }
+	%table
+		%tr
+			%th{ :scope => "row" }
+				%label{ :for => "red"} Red:
+			%td
+				%input#red{ :type => "range", :min => 0, :max => 255, :value => "{{red}}", :name => "red" }
+				%input#red{ :type => "number", :min => 0, :max => 255, :value => "{{red}}", :name => "red" }
+		%tr
+			%th{ :scope => "row" }
+				%label{ :for => "green"} Green:
+			%td
+				%input#green{ :type => "range", :min => 0, :max => 255, :value => "{{green}}", :name => "green" }
+				%input#green{ :type => "number", :min => 0, :max => 255, :value => "{{green}}", :name => "green" }
+		%tr
+			%th{ :scope => "row" }
+				%label{ :for => "blue"} Blue:
+			%td
+				%input#blue{ :type => "range", :min => 0, :max => 255, :value => "{{blue}}", :name => "blue" }
+				%input#blue{ :type => "number", :min => 0, :max => 255, :value => "{{blue}}", :name => "blue" }
+
+		%tr
+			%th{ :scope => "row" }
+				%label{ :for => "alpha"} Opacity:
+			%td
+				%input#alpha{ :type => "range", :min => 0, :max => 100, :value => "{{alpha}}", :name => "alpha" }
+				%input#alpha{ :type => "number", :min => 0, :max => 100, :value => "{{alpha}}", :name => "alpha" }
+	%p.commit
+		%button.cancel Cancel
+		%button.ok OK
+	%span.tr
+		%span

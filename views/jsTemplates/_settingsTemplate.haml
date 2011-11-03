@@ -1,0 +1,25 @@
+%script#settingsTemplate{ :type => "text/html" }
+	%p
+		%label{ :for => "main_fg" } Foreground:
+		%span.colorwell
+			%input.fg#main_fg{ :style => "background-color: {{new ColorModel({color: settings.foreground}).rgba()}}", :name => "fg", :value => "{{settings.foreground}}" }
+	%p
+		%label{ :for => "main_bg" } Background:
+		%span.colorwell
+			%input.fg#main_bg{ :style => "background-color: {{new ColorModel({color: settings.background}).rgba()}}", :name => "bg", :value => "{{settings.background}}" }
+	%p
+		%label{ :for => "main_caret" } Caret:
+		%span.colorwell
+			%input.caret#main_caret{ :style => "background-color: {{new ColorModel({color: settings.caret}).rgba()}}", :name => "caret", :value => "{{settings.caret}}" }
+	%p
+		%label{ :for => "main_selection" } Selection:
+		%span.colorwell
+			%input.selection#main_selection{ :style => "background-color: {{new ColorModel({color: settings.selection}).rgba()}}", :name => "selection", :value => "{{settings.selection}}" }
+	%p
+		%label{ :for => "main_invisibles" } Invisibles:
+		%span.colorwell
+			%input.invisibles#main_invisibles{ :style => "background-color: {{new ColorModel({color: settings.invisibles}).rgba()}}", :name => "invisibles", :value => "{{settings.invisibles}}" }
+	%p
+		%label{ :for => "main_lineHighlight" } Line Highlight:
+		%span.colorwell
+			%input.lineHighlight#main_lineHighlight{ :style => "background-color: {{new ColorModel({color: settings.lineHighlight}).rgba()}}", :name => "lineHighlight", :value => "{{settings.lineHighlight}}" }
