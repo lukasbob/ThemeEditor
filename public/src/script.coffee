@@ -1,4 +1,4 @@
-	$ ->
+$ ->
 
  ##########################################################################
  #                                                                        #
@@ -72,7 +72,7 @@
 
 ###############################################################################
 
-	window.RulesView = class RulesView extends Backbone.View
+	class RulesView extends Backbone.View
 
 		el: $("#content")
 
@@ -114,7 +114,7 @@
 
 ###############################################################################
 
-	window.RuleView = class RuleView extends Backbone.View
+	class RuleView extends Backbone.View
 
 		tagName: "tr"
 
@@ -211,7 +211,7 @@
 
 ###############################################################################
 
-	window.SettingsView = class SettingsView extends Backbone.View
+	class SettingsView extends Backbone.View
 
 		tagName: "fieldset"
 
@@ -299,7 +299,7 @@
 					rgba: @rgba()
 
 ###############################################################################
-	window.HeaderView = class HeaderView extends Backbone.View
+	class HeaderView extends Backbone.View
 
 		el: $("header")
 
@@ -308,7 +308,7 @@
 			@$(".author").text @model.get "author"
 			@
 
-	window.ActiveView = class ActiveView extends Backbone.View
+	class ActiveView extends Backbone.View
 
 		el: $("div.selected")
 
@@ -320,7 +320,7 @@
 
 		update: (e) => @model.set scope: e.currentTarget.value
 
-	window.SidebarView = class SidebarView extends Backbone.View
+	class SidebarView extends Backbone.View
 
 		el: $("#sidebar")
 
@@ -424,10 +424,11 @@
 		show: =>
 			@setPosition()
 			$(@el).removeClass('hide')
+			@
+
 		hide: =>
 			@model.destroy()
 			$(@el).addClass('hide')
-			# $(@el).fadeOut 200, -> $(@el).empty()
 
 ###############################################################################
 
