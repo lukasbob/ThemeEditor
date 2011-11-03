@@ -187,7 +187,7 @@ $ ->
 			cell = e.currentTarget
 			window.colorPicker.model = new ColorModel { color: cell.value }
 			window.colorPicker.options.anchor = cell
-			window.colorPicker.render().show().bind "commit", (color) =>
+			window.colorPicker.render().reveal().bind "commit", (color) =>
 				$(cell).val(color).change()
 
 		activate: => $(@el).addClass("active").find('input[name*="name"]').focus()
@@ -248,7 +248,7 @@ $ ->
 		showColorPicker: (e) =>
 			window.colorPicker.model = new ColorModel { color: e.currentTarget.value }
 			window.colorPicker.options.anchor = e.currentTarget
-			window.colorPicker.render().show().bind "commit", (color) =>
+			window.colorPicker.render().reveal().bind "commit", (color) =>
 				$(e.currentTarget).val(color).change()
 
 		fg: (e)            =>	@model.get("settings").set "foreground": e.currentTarget.value
@@ -407,7 +407,6 @@ $ ->
 			}
 
 			@el.innerHTML = content
-			$(@el).fadeIn 200
 			@
 
 		renderColor: =>
@@ -458,14 +457,15 @@ $ ->
 			@trigger "commit", @model.get "color"
 			@hide()
 
-		show: =>
+		reveal: =>
 			@setPosition()
-			$(@el).removeClass('hide')
+			$(@el).removeClass('hidden hide')
 			@
 
 		hide: =>
 			@model.destroy()
 			$(@el).addClass('hide')
+			_.delay (=> $(@el).addClass('hidden')), 300
 
 ###############################################################################
 

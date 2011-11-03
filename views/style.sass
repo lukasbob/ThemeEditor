@@ -310,6 +310,7 @@ tr.active
 	background: #fff
 	line-height: 2em
 	opacity: 1
+	display: block
 	-webkit-transform: scale(1)
 	-webkit-transition-property: opacity, -webkit-transform
 	-webkit-transition-duration: .2s
@@ -318,6 +319,8 @@ tr.active
 	-moz-transition-property: opacity, -webkit-transform
 	-moz-transition-duration: .2s
 	-moz-transition-timing-function: linear
+	&.hidden
+		display: none
 	&.hide
 		opacity: 0
 		-webkit-transform: scale(1.1) translate(-3em, 0)
