@@ -1,3 +1,29 @@
+window.helpers =
+	titleCase: (word) ->
+		word.replace(/([A-Z])/g, " $1").replace /(^[a-z])/, (s, group) -> group.toUpperCase()
+
+	pad: (word, charCount, char = " ") ->
+		return word if word.length >= charCount
+		padding = charCount - word.length
+		paddingString = ""
+		paddingString = "#{char}#{paddingString}" for x in [0...padding]
+		"#{word}#{paddingString}"
+
+	getField: (key, value) ->
+		include = "Not set"
+		if /^#([0-9a-f]{2}){3,4}/i.test(value)
+			rgba = new ColorModel(color: value).rgba()
+			include = "<span class='colorwell'>
+				<input id='main_#{key}' data-key='#{key}' style='background-color: #{rgba};' value='#{value}'>
+				<span class='color'>#{helpers.pad value, 9} : #{rgba}</span>
+			</span>"
+		else if $.isNumeric value
+			include = "<input id='main_#{key}' data-key='#{key}' value='#{value}' type='number' class='txt'>"
+		else
+			include = "<input id='main_#{key}' data-key='#{key}' value='#{value}' class='txt'>"
+
+		include
+
 $ ->
 
  ##########################################################################
@@ -13,7 +39,9 @@ $ ->
  #                                                                        #
  ##########################################################################
 
-	_.templateSettings = { interpolate : /\{\{(.+?)\}\}/g }
+	_.templateSettings =
+		interpolate : /\{\{(.+?)\}\}/g
+		evaluate: /\<\@(.+?)\@\>/gim
 
 ###############################################################################
 
@@ -96,7 +124,7 @@ $ ->
 
 
 		render: =>
-			@$('tbody').empty()
+			@$('.table tbody').empty()
 			@$('.table').css
 				backgroundColor: @model.get("settings").first().get("settings").get("background")
 				color: @model.get("settings").first().get("settings").get("foreground")
@@ -109,7 +137,7 @@ $ ->
 			@
 
 		renderRule: (rule) ->
-			@$('tbody').append((newRule = new RuleView { model: rule }).render().el)
+			@$('.table tbody').append((newRule = new RuleView { model: rule }).render().el)
 			newRule
 
 		renderMainSettings: (rule) ->
@@ -229,14 +257,10 @@ $ ->
 		template: _.template($("#settingsTemplate").html())
 
 		events:
-			"click .colorwell input"     : "showColorPicker"
-			"focus .colorwell input"     : "showColorPicker"
-			"change #main_fg"            : "fg"
-			"change #main_bg"            : "bg"
-			"change #main_caret"         : "caret"
-			"change #main_selection"     : "selection"
-			"change #main_invisibles"    : "invisibles"
-			"change #main_lineHighlight" : "lineHighlight"
+			"click .colorwell input" : "showColorPicker"
+			"focus .colorwell input" : "showColorPicker"
+			"change input"           : "update"
+			"click .delete"          : "delete"
 
 		initialize: ->
 			@model.get("settings").bind "change", => @render()
@@ -252,12 +276,16 @@ $ ->
 			window.colorPicker.render().reveal().bind "commit", (color) =>
 				$(e.currentTarget).val(color).change()
 
-		fg: (e)            =>	@model.get("settings").set "foreground": e.currentTarget.value
-		bg: (e)            =>	@model.get("settings").set "background": e.currentTarget.value
-		caret: (e)         =>	@model.get("settings").set "caret": e.currentTarget.value
-		selection: (e)     =>	@model.get("settings").set "selection": e.currentTarget.value
-		invisibles: (e)    =>	@model.get("settings").set "invisibles": e.currentTarget.value
-		lineHighlight: (e) =>	@model.get("settings").set "lineHighlight": e.currentTarget.value
+		update: (e) =>
+			setter = {}
+			setter[$(e.currentTarget).data("key")] = e.currentTarget.value
+			@model.get("settings").set setter
+
+		delete: (e) =>
+			key = $(e.currentTarget).data("key")
+			if confirm "Delete the #{key} setting?"
+				@model.get("settings").unset key
+
 
 	window.ColorModel = class ColorModel extends Backbone.Model
 		defaults:
@@ -341,7 +369,7 @@ $ ->
 		select: (e) =>
 			statusModel.set
 				thinking: yes
-				text: "Loading #{$(e.currentTarget).text()}"
+				text: "Loading #{$(e.currentTarget).text()}..."
 			$.getJSON "#{e.currentTarget.href}&o=json", (data) =>
 
 				window.myList = new Plist data

@@ -48,6 +48,10 @@ $border_color: #a6a6a6
 	background: -ms-linear-gradient(top, $start 0%,$stop 100%)
 	background: linear-gradient(top, $start 0%,$stop 100%)
 
+@mixin mono
+	font-family: menlo
+	font-size: 13px
+
 @mixin ell
 	overflow: hidden
 	text-overflow: ellipsis
@@ -164,7 +168,7 @@ header
 		padding: 0
 		box-shadow: inset rgba(0,0,0,.2) 0 1px 2px
 		display: inline-block
-		width: 20px
+		width: 100%
 		height: 20px
 
 .bold
@@ -210,7 +214,7 @@ header
 		box-sizing: border-box
 		text-indent: 3px
 		line-height: 19px
-		font-family: menlo
+		@include mono
 		@include full($r: 50px)
 		margin: 0
 	button
@@ -221,7 +225,7 @@ header
 		width: 40px
 
 .table
-	@include full($t: 70px, $b: 47px, $r: 10px)
+	@include full($t: 177px, $b: 47px, $r: 10px)
 	background: #fff
 	overflow: hidden
 	border: 1px solid $border_color
@@ -282,7 +286,7 @@ input[name*="name"], tr span.name
 	border: 0 none
 	color: inherit
 	margin: 0
-	font-family: menlo
+	@include mono
 	font-size: 13px
 	line-height: 18px
 	background-color: transparent
@@ -364,7 +368,7 @@ tr.active
 		height: 40px
 		box-shadow: inset rgba(0,0,0,.4) 0 1px 2px
 		font-size: 20px
-		font-family: menlo
+		@include mono
 		line-height: 40px
 		text-align: center
 		@include rounded(4px)
@@ -403,12 +407,65 @@ tr.active
 		width: 50px
 		text-align: right
 
-fieldset
-	@include full_top($t: 10px, $r: 10px)
-	p
+.mainSettings fieldset
+	@include full_top($t: 10px, $r: 10px, $h: 157px)
+	z-index: 100
+	overflow-y: scroll
+	overflow-x: hidden
+	ul
+		border-top: 1px solid rgba(0,0,0,.05)
+	li
+		line-height: 25px
+	label, .field
+		box-sizing: border-box
+		@include ell
+		float: left
+
+		border-bottom: 1px solid rgba(0,0,0,.05)
+	.field
+		background: #fff
+		padding: 0 .5em
+		@include mono
+		width: 60%
+		position: relative
+	.color
+		white-space: pre
+	button
+		position: absolute
+		right: 5.5px
+		top: 5.5px
+		height: 16px
+		width: 16px
+		display: block
+		background: rgba(0,0,0,.1)
+		border-radius: 10px
+		border: 0
+		text-indent: -999em
+		-webkit-transition: background .3s
+		&::after
+			content: "\2716"
+			text-indent: 0
+			position: absolute
+			top: 0
+			left: 0
+			width: 16px
+			height: 16px
+			line-height: 16px
+			color: #fff
+			text-shadow: rgba(0,0,0,.4) 0 0 0
+		&:hover
+			-webkit-transition: background .3s
+			background: rgba(196,37,59,.6)
+	label
 		text-align: right
-		display: inline-block
-		width: 30%
+		width: 40%
+		padding: 0 1em
+	input.txt
+		@include mono
+		border: 0 none
+		width: 100%
+		padding: 0
+		margin: 0
 		line-height: 25px
 
 
@@ -416,15 +473,15 @@ fieldset
 
 @-webkit-keyframes rotateThis
 	0%
-		-webkit-transform: scale(0.15) rotate(0deg)
+		-webkit-transform: scale(0.5) rotate(0deg)
 	100%
-		-webkit-transform: scale(0.15) rotate(360deg)
+		-webkit-transform: scale(0.5) rotate(360deg)
 
 @-moz-keyframes rotateThis
 	0%
-		-moz-transform: scale(0.15) rotate(0deg)
+		-moz-transform: scale(0.5) rotate(0deg)
 	100%
-		-moz-transform: scale(0.15) rotate(360deg)
+		-moz-transform: scale(0.5) rotate(360deg)
 .status
 	background: rgba(0,0,0,.7)
 	box-shadow: inset rgba(0,0,0,.2) 0 2px 5px
@@ -432,7 +489,7 @@ fieldset
 	color: rgba(255,255,255,.7)
 	height: 30px
 	line-height: 30px
-	padding: 0 10px 0 35px
+	padding: 0 10px 0 30px
 	width: 150px
 	@include rounded(2px)
 	position: absolute
@@ -440,60 +497,23 @@ fieldset
 	right: 10px
 	position: absolute
 	&.thinking .spinner
-		opacity: 1
-	.spinner
-		opacity: 0
-		width: 100px
-		height: 100px
-		position: absolute
-		top: -35px
-		left: -35px
-		-webkit-transform: scale(0.15)
+		opacity: .7
+		-webkit-transition: opacity .1s
+		-webkit-transform: scale(0.5)
 		-webkit-animation-name: rotateThis
 		-webkit-animation-duration: 1.5s
 		-webkit-animation-iteration-count: infinite
 		-webkit-animation-timing-function: linear
-		-moz-transform: scale(0.15)
 		-moz-animation-name: rotateThis
 		-moz-animation-duration: 1.5s
 		-moz-animation-iteration-count: infinite
 		-moz-animation-timing-function: linear
-		div
-			width: 15px
-			height: 30px
-			background: #fff
-			position: absolute
-			top: 35px
-			left: 45px
-		.bar1
-			-webkit-transform: rotate(0deg) translate(0, -40px)
-			-moz-transform: rotate(0deg) translate(0, -40px)
-			opacity: 0.12
-		.bar2
-			-webkit-transform: rotate(45deg) translate(0, -40px)
-			-moz-transform: rotate(45deg) translate(0, -40px)
-			opacity: 0.25
-		.bar3
-			-webkit-transform: rotate(90deg) translate(0, -40px)
-			-moz-transform: rotate(90deg) translate(0, -40px)
-			opacity: 0.37
-		.bar4
-			-webkit-transform: rotate(135deg) translate(0, -40px)
-			-moz-transform: rotate(135deg) translate(0, -40px)
-			opacity: 0.50
-		.bar5
-			-webkit-transform: rotate(180deg) translate(0, -40px)
-			-moz-transform: rotate(180deg) translate(0, -40px)
-			opacity: 0.62
-		.bar6
-			-webkit-transform: rotate(225deg) translate(0, -40px)
-			-moz-transform: rotate(225deg) translate(0, -40px)
-			opacity: 0.75
-		.bar7
-			-webkit-transform: rotate(270deg) translate(0, -40px)
-			-moz-transform: rotate(270deg) translate(0, -40px)
-			opacity: 0.87
-		.bar8
-			-webkit-transform: rotate(315deg) translate(0, -40px)
-			-moz-transform: rotate(315deg) translate(0, -40px)
-			opacity: 1
+	.spinner
+		-webkit-transition: opacity .1s
+		-webkit-transform: scale(0.5)
+		opacity: 0
+		width: 30px
+		height: 30px
+		position: absolute
+		left: 0
+		background: url(/img/cog.svg) no-repeat center center

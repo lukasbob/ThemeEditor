@@ -1,5 +1,5 @@
 Gemfile.lock
-tmp/restart.txt
+tmp/
 .sass-cache/*
 .rvmrc
 .DS_Store
