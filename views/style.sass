@@ -213,6 +213,7 @@ header
 		border: 1px solid $border_color
 		padding: 3px 0
 		box-sizing: border-box
+		-moz-box-sizing: border-box
 		text-indent: 3px
 		line-height: 19px
 		@include mono
@@ -373,21 +374,17 @@ tr.active
 		line-height: 40px
 		text-align: center
 		@include rounded(4px)
+		border: 0
 
 	input[type=range]
-		position: absolute
-		left: 10px
-		right: 50px
-		height: 2em
+		width: 100%
 
 	input[type=number]
 		@include rounded(3px)
 		border: 1px solid $border_color
 		padding: .3em
 		text-align: right
-		position: absolute
-		width: 40px
-		right: 0
+		width: 100%
 
 	input[type=color]
 		-webkit-appearance: none
@@ -402,7 +399,9 @@ tr.active
 		text-align: right
 
 	td
-		position: relative
+		padding: 0 4px
+		&.num
+			width: 40px
 
 	th
 		width: 50px
@@ -411,21 +410,23 @@ tr.active
 .mainSettings fieldset
 	@include full_top($t: 10px, $r: 10px, $h: 157px)
 	z-index: 100
-	overflow-y: scroll
-	overflow-x: hidden
 	ul
+		@include full
+		overflow-x: hidden
+		overflow-y: scroll
 		border-top: 1px solid rgba(0,0,0,.05)
 	li
 		line-height: 25px
 	label, .field
 		box-sizing: border-box
+		-moz-box-sizing: border-box
 		@include ell
 		float: left
 
-		border-bottom: 1px solid rgba(0,0,0,.05)
+		border-bottom: 1px solid rgba(0,0,0,.02)
 	.field
-		background: #fff
-		padding: 0 .5em
+		//background: #fff
+		padding: 0 2em 0 .5em
 		@include mono
 		width: 60%
 		position: relative
@@ -438,14 +439,15 @@ tr.active
 		height: 16px
 		width: 16px
 		display: block
-		background: rgba(0,0,0,.1)
-		border-radius: 10px
+		background: rgba(0,0,0,.3)
+		@include rounded(10px)
 		border: 0
 		text-indent: -999em
 		-webkit-transition: background .3s
 		&::after
 			content: "\2716"
 			text-indent: 0
+			text-align: center
 			position: absolute
 			top: 0
 			left: 0
@@ -456,7 +458,7 @@ tr.active
 			text-shadow: rgba(0,0,0,.4) 0 0 0
 		&:hover
 			-webkit-transition: background .3s
-			background: rgba(196,37,59,.6)
+			background: rgba(181,42,29,.9)
 	label
 		text-align: right
 		width: 40%
