@@ -9,6 +9,10 @@ window.helpers =
 		paddingString = "#{char}#{paddingString}" for x in [0...padding]
 		"#{word}#{paddingString}"
 
+	shorten: (word, charCount) ->
+		return word if word.length <= charCount + 3
+		$('<div/>').append($('<span/>').attr("title", word).text("#{word.substr(0, charCount)}...")).html()
+
 	getField: (key, value) ->
 		include = "Not set"
 		if /^#([0-9a-f]{2}){3,4}/i.test(value)
@@ -63,7 +67,7 @@ $ ->
 			@get("settings").bind "remove", @save
 			statusModel.set
 				thinking: no
-				text: "#{@get("name")} is ready!"
+				text: "#{helpers.shorten @get("name"), 15} is ready!"
 
 		save: =>
 			statusModel.set
@@ -408,7 +412,7 @@ $ ->
 			else
 				$(@el).removeClass('thinking')
 
-		updateText: (model, text) => @$('.text').text(text)
+		updateText: (model, text) => @$('.text').html(text)
 
 ###############################################################################
 
