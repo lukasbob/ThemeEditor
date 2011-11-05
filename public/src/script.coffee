@@ -418,7 +418,7 @@ $ ->
 
 	class ColorPickerView extends Backbone.View
 
-		className: "colorpicker"
+		className: "colorpicker hide"
 
 		template: _.template($("#colorTemplate").html())
 
@@ -472,7 +472,7 @@ $ ->
 			posTop    = 10 if posTop < 10
 			posTop    = winHeight - elHeight - 10 if elHeight + posTop > winHeight
 
-			# Move the triangular pointer if there has beenany adjustment in top position.
+			# Move the triangular pointer if there is any adjustment to the top position.
 			hAdjust =  orgPosTop - posTop
 			if hAdjust isnt 0
 				pointerTopMargin = parseInt @$('.tr').css("margin-top").split("px")[0], 10
@@ -495,13 +495,14 @@ $ ->
 
 		reveal: =>
 			@setPosition()
-			$(@el).removeClass('hidden hide')
+			$(@el).removeClass('hidden')
+			_.delay (=> $(@el).removeClass('hide')), 10
 			@
 
 		hide: =>
 			@model.destroy()
 			$(@el).addClass('hide')
-			_.delay (=> $(@el).addClass('hidden')), 300
+			_.delay (=> $(@el).addClass('hidden')), 150
 
 ###############################################################################
 

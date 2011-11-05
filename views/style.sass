@@ -266,8 +266,11 @@ table.hidden thead
 		border-bottom: 1px solid rgba(0,0,0,.02)
 		vertical-align: middle
 
-	tr:focus td
-		box-shadow: #3879d9 0 0 5px
+	tr:focus td, tr.selected td
+		background: #3879d9
+		span.name, input[name="name"]
+			background: #3879d9!important
+			color: #fff!important
 
 	col.b
 		width: 80px
@@ -319,8 +322,8 @@ tr.active
 	display: block
 	-webkit-transform: scale(1)
 	-webkit-transition-property: opacity, -webkit-transform
-	-webkit-transition-duration: .2s
-	-webkit-transition-timing-function: linear
+	-webkit-transition-duration: .15s
+	-webkit-transition-timing-function: ease-in
 	-moz-transform: scale(1)
 	-moz-transition-property: opacity, -webkit-transform
 	-moz-transition-duration: .2s
@@ -329,13 +332,13 @@ tr.active
 		display: none
 	&.hide
 		opacity: 0
-		-webkit-transform: scale(1.1) translate(-3em, 0)
+		-webkit-transform: translate(50%, 0) scale(0.1)
 		-webkit-transition-property: opacity, -webkit-transform
-		-webkit-transition-duration: .2s
-		-webkit-transition-timing-function: linear
-		-moz-transform: scale(1.1) translate(-3em, 0)
+		-webkit-transition-duration: .15s
+		-webkit-transition-timing-function: ease-out
+		-moz-transform: translate(50%, 0) scale(0.1)
 		-moz-transition-property: opacity, -webkit-transform
-		-moz-transition-duration: .2s
+		-moz-transition-duration: .15s
 		-moz-transition-timing-function: linear
 	.tr
 		width: 15px
@@ -425,7 +428,6 @@ tr.active
 
 		border-bottom: 1px solid rgba(0,0,0,.02)
 	.field
-		//background: #fff
 		padding: 0 2em 0 .5em
 		@include mono
 		width: 60%
@@ -439,11 +441,10 @@ tr.active
 		height: 16px
 		width: 16px
 		display: block
-		background: rgba(0,0,0,.3)
+		background: rgba(0,0,0,0)
 		@include rounded(10px)
 		border: 0
 		text-indent: -999em
-		-webkit-transition: background .3s
 		&::after
 			content: "\2716"
 			text-indent: 0
@@ -454,11 +455,12 @@ tr.active
 			width: 16px
 			height: 16px
 			line-height: 16px
-			color: #fff
-			text-shadow: rgba(0,0,0,.4) 0 0 0
+			color: rgba(30,30,30,.3)
+			text-shadow: rgba(30,30,30,.1) 0 0 0
 		&:hover
-			-webkit-transition: background .3s
-			background: rgba(181,42,29,.9)
+			background: rgba(30,30,30,.5)
+		&:hover::after
+			color: rgba(255,255,255,.8)
 	label
 		text-align: right
 		width: 40%
@@ -520,3 +522,7 @@ tr.active
 		position: absolute
 		left: 0
 		background: url(/img/cog.svg) no-repeat center center
+
+::-moz-selectionm, ::selection
+
+
