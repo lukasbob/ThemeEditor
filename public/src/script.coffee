@@ -464,8 +464,7 @@ $ ->
 			hAdjust =  orgPosTop - posTop
 			if hAdjust isnt 0
 				pTopMargin = parseInt @$('.tr').css("margin-top").split("px")[0], 10
-				@$('.tr').css
-					marginTop: hAdjust + pTopMargin
+				@$('.tr').css	marginTop: hAdjust + pTopMargin
 
 			$(@el).css
 				top: posTop
@@ -489,14 +488,14 @@ $ ->
 		show: =>
 			$(window).bind "keydown.colorpicker", @handleKeypress
 			@setPosition()
-			$(@el).removeClass('hidden')
-			_.delay (=> $(@el).removeClass('hide')), 1
+			$(@el).removeClass 'hidden'
+			_.delay (=> $(@el).removeClass('hide').find("input").eq(0).focus()), 1
 			@
 
 		hide: =>
 			$(window).unbind "keydown.colorpicker"
 			@model.destroy()
-			$(@el).addClass('hide')
+			$(@el).addClass 'hide'
 			_.delay (=> $(@el).addClass('hidden')), 150
 
 ###############################################################################
