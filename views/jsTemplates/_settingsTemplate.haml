@@ -2,7 +2,7 @@
 	%ul
 		<@ _.each(settings, function(v, k) { var field = helpers.getField(k, v), text = helpers.titleCase(k); @>
 		%li
-			%label{ :for => "main_{{k}}", :title => "{{text}}" } {{text}}:
+			%label.key{ :for => "main_{{k}}", :title => "{{text}}" } {{text}}:
 			%span.field
 				{{field}}
 				%button.delete{ "data-key" => "{{k}}", :title => "Delete the {{text}} property." } Delete

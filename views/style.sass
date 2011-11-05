@@ -1,5 +1,5 @@
 
-$border_color: #a6a6a6
+$border_color: #acacac
 
 @mixin default_button($text, $width, $height)
 	line-height: $height
@@ -128,26 +128,25 @@ body
 	font-family: 'Lucida Grande'
 	font-size: 12px
 	line-height: 18px
-	background: #ddd
+	background: #ebebeb
 
 header
-	@include gradient(#5b6773, #4d5660)
+	@include gradient(#cccccc, #afafaf)
+	border-bottom: 1px solid #8b8b8b
 
 	h1
 		line-height: 50px
 		float: left
-		font-size: 26px
-		font-family: cochin
-		font-style: italic
-		font-weight: bold
-		color: #e5e5e5
-		text-shadow: #0C1021 0 1px 1px
+		font-size: 20px
+		font-family: 'Helvetica Neue'
+		color: #444
 		margin: 0 10px
 
 	.author
 		line-height: 15px
-		padding: 21px 0 14px
-		color: #aaa
+		padding: 19px 0 14px
+		color: #777
+		font-style: italic
 
 .colorwell
 	line-height: normal
@@ -417,7 +416,7 @@ tr.active
 		border-top: 1px solid rgba(0,0,0,.05)
 	li
 		line-height: 25px
-	label, .field
+	label.key, .field
 		box-sizing: border-box
 		@include ell
 		float: left
@@ -457,7 +456,7 @@ tr.active
 		&:hover
 			-webkit-transition: background .3s
 			background: rgba(196,37,59,.6)
-	label
+	label.key
 		text-align: right
 		width: 40%
 		padding: 0 1em
