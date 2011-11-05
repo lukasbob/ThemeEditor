@@ -19,7 +19,7 @@ window.helpers =
 			rgba = new ColorModel(color: value).rgba()
 			include = "<span class='colorwell'>
 				<input id='main_#{key}' data-key='#{key}' style='background-color: #{rgba};' value='#{value}'>
-				<span class='color'>#{helpers.pad value, 9} : #{rgba}</span>
+				<label for='main_#{key}' class='color'>#{helpers.pad value, 9} : #{rgba}</label>
 			</span>"
 		else if $.isNumeric value
 			include = "<input id='main_#{key}' data-key='#{key}' value='#{value}' type='number' class='txt'>"
