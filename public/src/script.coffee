@@ -1,6 +1,9 @@
+hexColorRegex = /^#([0-9a-f]{2}){3,4}/i
+
 window.helpers =
 	titleCase: (word) ->
-		word.replace(/([A-Z])/g, " $1").replace /(^[a-z])/, (s, group) -> group.toUpperCase()
+		word.replace(/([A-Z])/g, " $1").replace /(^[a-z])/, (s, group) ->
+			group.toUpperCase()
 
 	pad: (word, charCount, char = " ") ->
 		return word if word.length >= charCount
@@ -14,8 +17,7 @@ window.helpers =
 		$('<div/>').append($('<span/>').attr("title", word).text("#{word.substr(0, charCount)}...")).html()
 
 	getField: (key, value) ->
-		include = "Not set"
-		if /^#([0-9a-f]{2}){3,4}/i.test(value)
+		if hexColorRegex.test value
 			rgba = new ColorModel(color: value).rgba()
 			include = "<span class='colorwell'>
 				<input id='main_#{key}' data-key='#{key}' style='background-color: #{rgba};' value='#{value}'>
@@ -65,12 +67,12 @@ $ ->
 			@bind "change", @save
 			@get("settings").bind "change", @save
 			@get("settings").bind "remove", @save
-			statusModel.set
+			wStatusModel.set
 				thinking: no
 				text: "#{helpers.shorten @get("name"), 15} is ready!"
 
 		save: =>
-			statusModel.set
+			wStatusModel.set
 				thinking: yes
 				text: "Saving..."
 			$.ajax
@@ -80,7 +82,7 @@ $ ->
 				data: JSON.stringify @toJSON()
 				contentType: 'application/json; charset=utf-8'
 				success: (data) ->
-					statusModel.set
+					wStatusModel.set
 						thinking: no
 						text: "Saved #{data}"
 					$(window).trigger "save"
@@ -100,6 +102,8 @@ $ ->
 		}]
 
 		initialize: -> unless @get("settings")? then @set settings: new Settings
+
+		fontStyle: -> @get("settings").get "fontStyle"
 
 ###############################################################################
 
@@ -125,13 +129,12 @@ $ ->
 			@model.get("settings").bind 'add', (rule) =>
 				@renderRule(rule).activate()
 
-
-
 		render: =>
+			settings = @model.get("settings").first().get "settings"
 			@$('.table tbody').empty()
 			@$('.table').css
-				backgroundColor: @model.get("settings").first().get("settings").get("background")
-				color: @model.get("settings").first().get("settings").get("foreground")
+				backgroundColor: settings.get "background"
+				color: settings.get "foreground"
 
 			@model.get("settings").each (rule, index) =>
 				if index is 0
@@ -141,11 +144,12 @@ $ ->
 			@
 
 		renderRule: (rule) ->
-			@$('.table tbody').append((newRule = new RuleView { model: rule }).render().el)
-			newRule
+			view = new RuleView  model: rule
+			@$('.table tbody').append view.render().el
+			view
 
 		renderMainSettings: (rule) ->
-			@$(".mainSettings").html((new SettingsView { model: rule }).render().el)
+			@$(".mainSettings").html (new SettingsView model: rule).render().el
 
 		addRule: =>
 			@model.get("settings").add new Rule
@@ -163,23 +167,20 @@ $ ->
 		template: _.template($("#settingsItemTemplate").html())
 
 		events:
-			"change .b"                : "bold"
-			"change .i"                : "italic"
-			"change .u"                : "underline"
-			"change .name"             : "name"
-
-			"change .fg"               : "fg"
-			"change .bg"               : "bg"
-			"click .delete"            : "delete"
-			"click .colorwell input"   : "showColorPicker"
-			"focus .colorwell input"   : "showColorPicker"
-			"click"                    : "focus"
-			"focus"                    : "select"
-			'dblclick span'            : "activate"
-			'blur input[name*="name"]' : "deactivate"
-			'keydown'                 : "handleKeypress"
-
-		isSelected: => $(@el).hasClass('selected')
+			"change .b"              : "b"
+			"change .i"              : "i"
+			"change .u"              : "u"
+			"change .name"           : "name"
+			"change .fg"             : "fg"
+			"change .bg"             : "bg"
+			"click .delete"          : "delete"
+			"click .colorwell input" : "showColorPicker"
+			"focus .colorwell input" : "showColorPicker"
+			"click"                  : "focus"
+			"focus"                  : "select"
+			'dblclick span'          : "activate"
+			'blur [name*="name"]'    : "deactivate"
+			'keydown'                : "handleKeypress"
 
 		initialize: ->
 			@model.get("settings").bind "change", => @render()
@@ -194,63 +195,62 @@ $ ->
 
 			$(@el).empty().html content
 			$(@el).attr tabindex: 0
-			fontStyle = @model.get("settings").get "fontStyle"
+			fontStyle = @model.fontStyle()
 			@$('.b').prop "checked", fontStyle?.indexOf("bold") > -1
 			@$('.i').prop "checked", fontStyle?.indexOf("italic") > -1
 			@$('.u').prop "checked", fontStyle?.indexOf("underline") > -1
 			@
 
-		toggleFontStyle: (style, add) =>
+		setFontStyle: (style, add) ->
 			if add then @addFontStyle(style) else @removeFontStyle(style)
 
-		addFontStyle: (style) =>
-			fontStyle = @model.get("settings").get("fontStyle")?.split(" ") or []
+		addFontStyle: (style) ->
+			fontStyle = @model.fontStyle()?.split(" ") or []
 			fontStyle.push style
-			@model.get("settings").set fontStyle: $.trim fontStyle.join(" ")
+			@model.get("settings").set fontStyle: $.trim fontStyle.join " "
 
-		removeFontStyle: (style) =>
+		removeFontStyle: (style) ->
 			@model.get("settings").set
-				fontStyle: $.trim @model.get("settings").get("fontStyle").replace(style, '')
+				fontStyle: $.trim @model.fontStyle().replace style, ""
 
-		delete: =>
+		delete: ->
 			@model.get("list").get("settings").remove @model
 			@remove()
 
-		showColorPicker: (e) =>
+		showColorPicker: (e) ->
 			cell = e.currentTarget
-			window.colorPicker.model = new ColorModel { color: cell.value }
-			window.colorPicker.options.anchor = cell
-			window.colorPicker.render().reveal().bind "commit", (color) =>
+			wColorPicker.model = new ColorModel color: cell.value
+			wColorPicker.options.anchor = cell
+			wColorPicker.render().show().bind "commit", (color) ->
 				$(cell).val(color).change()
 
-		activate: => $(@el).addClass("active").find('input[name*="name"]').focus()
+		activate: -> $(@el).addClass("active").find('[name*="name"]').focus()
 
-		deactivate: => $(@el).removeClass("active")
+		deactivate: -> $(@el).removeClass "active"
 
-		focus: =>	$(@el).focus()
+		focus: -> $(@el).focus()
 
-		select: =>
-			$(@el).parent().find(".selected").removeClass("selected")
-			$(@el).addClass('selected')
+		select: ->
+			$(@el).parent().find(".selected").removeClass "selected"
+			$(@el).addClass "selected"
 			window.active.model = @model
 			window.active.render()
 
-		handleKeypress: (e) =>
-			if (e.keyCode is 8 or e.keyCode is 46) and $(@el).is(":focus")
-				e.preventDefault()
-				@delete() if confirm "Delete this rule?"
+		handleKeypress: (e) ->
+			return unless $(@el).is ":focus"
+			switch e.keyCode
+				when 8, 46 # delete or backspace
+					e.preventDefault()
+					@delete() if confirm "Delete this rule?"
+				when 13 # return
+					@activate()
 
-			if (e.keyCode is 13) and $(@el).is(":focus")
-				@activate()
-
-
-
-		bold: (e)      => @toggleFontStyle "bold", e.currentTarget.checked
-		italic: (e)    => @toggleFontStyle "italic", e.currentTarget.checked
-		underline: (e) => @toggleFontStyle "underline", e.currentTarget.checked
-		name: (e)      => @model.set "name": e.currentTarget.value
-		fg: (e)        =>	@model.get("settings").set "foreground": e.currentTarget.value
-		bg: (e)        =>	@model.get("settings").set "background": e.currentTarget.value
+		b: (e)    -> @setFontStyle "bold", e.currentTarget.checked
+		i: (e)    -> @setFontStyle "italic", e.currentTarget.checked
+		u: (e)    -> @setFontStyle "underline", e.currentTarget.checked
+		name: (e) -> @model.set "name": e.currentTarget.value
+		fg: (e)   -> @model.get("settings").set "foreground": e.currentTarget.value
+		bg: (e)   -> @model.get("settings").set "background": e.currentTarget.value
 
 ###############################################################################
 
@@ -258,7 +258,7 @@ $ ->
 
 		tagName: "fieldset"
 
-		template: _.template($("#settingsTemplate").html())
+		template: _.template $("#settingsTemplate").html()
 
 		events:
 			"click .colorwell input" : "showColorPicker"
@@ -275,9 +275,9 @@ $ ->
 			@
 
 		showColorPicker: (e) =>
-			window.colorPicker.model = new ColorModel { color: e.currentTarget.value }
-			window.colorPicker.options.anchor = e.currentTarget
-			window.colorPicker.render().reveal().bind "commit", (color) =>
+			wColorPicker.model = new ColorModel color: e.currentTarget.value
+			wColorPicker.options.anchor = e.currentTarget
+			wColorPicker.render().show().bind "commit", (color) =>
 				$(e.currentTarget).val(color).change()
 
 		update: (e) =>
@@ -286,7 +286,7 @@ $ ->
 			@model.get("settings").set setter
 
 		delete: (e) =>
-			key = $(e.currentTarget).data("key")
+			key = $(e.currentTarget).data "key"
 			if confirm "Delete the #{key} setting?"
 				@model.get("settings").unset key
 
@@ -301,12 +301,8 @@ $ ->
 			@bind "change", @buildColor
 
 		parseColor: =>
-			[hex, r, g, b, a] = @get("color").split /#([\w]{2})([\w]{2})([\w]{2})([\w]{2})?/gi
-			@set
-				red: @toInt r
-				green: @toInt g
-				blue: @toInt b
-				alpha: if a then a else 100
+			[r, g, b, a] = @get("color").replace("#", '').match /.{2}/g
+			@set r: @toInt(r), g: @toInt(g), b: @toInt(b), a: a or 100
 
 		toHex: (i) =>
 			output = parseInt(i, 10).toString 16
@@ -315,7 +311,7 @@ $ ->
 		toInt: (hex) => parseInt (if hex then hex else 0), 16
 
 		alpha: (i) =>
-			output = parseInt(i, 10)
+			output = parseInt i, 10
 			return "" if output is 100
 			if output.toString().length is 1 then "0#{output}" else "#{output}"
 
@@ -323,23 +319,19 @@ $ ->
 			if @get("color") is "#ffffff00"
 				""
 			else
-				"rgba(#{@get "red"},#{@get "green"},#{@get "blue"},#{parseInt(@get("alpha"), 10)/100})"
+				"rgba(#{@get "r"},#{@get "g"},#{@get "b"},#{parseInt(@get("a"), 10)/100})"
 
 		hex:  =>
-			"##{@toHex @get("red")}#{@toHex @get("green")}#{@toHex @get("blue")}#{@alpha @get("alpha")}"
+			"##{@toHex @get "r"}#{@toHex @get "g"}#{@toHex @get "b"}#{@alpha @get "a"}"
 
 		bestTextColor: =>
 			threshold = 105
-			bgDelta = ((@get("red") * 0.299) + (@get("green") * 0.587) + (@get("blue") * 0.114))
-			if ((255 - bgDelta) * @get("alpha") / 100 < threshold) then "#000" else "#fff"
+			bgDelta = (0.299 * @get "r") + (0.587 * @get "g") + (0.114 * @get "b")
+			if (255 - bgDelta) * @get("a") / 100 < threshold then "#000" else "#fff"
 
-		buildColor: (item) =>
-			if item.hasChanged "color"
-				@parseColor()
-			else
-				@set
-					color: @hex()
-					rgba: @rgba()
+		buildColor: (m) =>
+			if m.hasChanged "color" then @parseColor()
+			else @set color: @hex(), rgba: @rgba()
 
 ###############################################################################
 	class HeaderView extends Backbone.View
@@ -359,7 +351,7 @@ $ ->
 			"change input": "update"
 
 		render: ->
-			@$('input').val @model.get("scope")
+			@$('input').val @model.get "scope"
 
 		update: (e) => @model.set scope: e.currentTarget.value
 
@@ -371,11 +363,10 @@ $ ->
 			"click a": "select"
 
 		select: (e) =>
-			statusModel.set
+			wStatusModel.set
 				thinking: yes
 				text: "Loading #{$(e.currentTarget).text()}..."
 			$.getJSON "#{e.currentTarget.href}&o=json", (data) =>
-
 				window.myList = new Plist data
 				window.rules.model = myList
 				window.rules.render()
@@ -383,10 +374,10 @@ $ ->
 				window.header.model = myList
 				window.header.render()
 				document.title = "Theme: #{myList.get("name")}"
-				history.pushState({}, "", e.currentTarget.href)
+				history.pushState {}, "", e.currentTarget.href
 
-				@$(".selected").removeClass("selected")
-				$(e.currentTarget).addClass("selected")
+				@$(".selected").removeClass "selected"
+				$(e.currentTarget).addClass "selected"
 			e.preventDefault()
 
 ###############################################################################
@@ -406,13 +397,11 @@ $ ->
 			$(@el).empty().html content
 			@
 
-		setThinking: (model, thinking) =>
-			if thinking
-				$(@el).addClass('thinking')
-			else
-				$(@el).removeClass('thinking')
+		setThinking: (m, thinking) =>
+			if thinking then $(@el).addClass 'thinking'
+			else $(@el).removeClass 'thinking'
 
-		updateText: (model, text) => @$('.text').html(text)
+		updateText: (m, content) => @$('.text').html content
 
 ###############################################################################
 
@@ -430,12 +419,11 @@ $ ->
 		render: ->
 			# Make sure there is nothing bound to the commit event.
 			@unbind "commit"
-
 			@model.bind "change:color", @renderColor
-			@model.bind "change:red", @renderRangeControls
-			@model.bind "change:green", @renderRangeControls
-			@model.bind "change:blue", @renderRangeControls
-			@model.bind "change:alpha", @renderRangeControls
+			@model.bind "change:r", @renderRangeControls
+			@model.bind "change:g", @renderRangeControls
+			@model.bind "change:b", @renderRangeControls
+			@model.bind "change:a", @renderRangeControls
 
 			content = @template _.extend @model.toJSON(), {
 				rgba: @model.rgba(),
@@ -452,10 +440,10 @@ $ ->
 			}).val @model.get "color"
 
 		renderRangeControls: =>
-			@$("#red").val @model.get "red"
-			@$("#green").val @model.get "green"
-			@$("#blue").val @model.get "blue"
-			@$("#alpha").val @model.get "alpha"
+			@$("#red").val @model.get "r"
+			@$("#green").val @model.get "g"
+			@$("#blue").val @model.get "b"
+			@$("#alpha").val @model.get "a"
 
 		setPosition: =>
 			pos       = $(@options.anchor).offset()
@@ -472,12 +460,12 @@ $ ->
 			posTop    = 10 if posTop < 10
 			posTop    = winHeight - elHeight - 10 if elHeight + posTop > winHeight
 
-			# Move the triangular pointer if there is any adjustment to the top position.
+			# Move the pointer if there is any adjustment to the top position.
 			hAdjust =  orgPosTop - posTop
 			if hAdjust isnt 0
-				pointerTopMargin = parseInt @$('.tr').css("margin-top").split("px")[0], 10
+				pTopMargin = parseInt @$('.tr').css("margin-top").split("px")[0], 10
 				@$('.tr').css
-					marginTop: hAdjust + pointerTopMargin
+					marginTop: hAdjust + pTopMargin
 
 			$(@el).css
 				top: posTop
@@ -493,37 +481,39 @@ $ ->
 			@trigger "commit", @model.get "color"
 			@hide()
 
-		reveal: =>
+		handleKeypress: (e) =>
+			switch e.keyCode
+				when 13 then @commit()
+				when 27 then @hide()
+
+		show: =>
+			$(window).bind "keydown.colorpicker", @handleKeypress
 			@setPosition()
 			$(@el).removeClass('hidden')
-			_.delay (=> $(@el).removeClass('hide')), 10
+			_.delay (=> $(@el).removeClass('hide')), 1
 			@
 
 		hide: =>
+			$(window).unbind "keydown.colorpicker"
 			@model.destroy()
 			$(@el).addClass('hide')
 			_.delay (=> $(@el).addClass('hidden')), 150
 
 ###############################################################################
 
-	$('tbody').hide()
-
-	window.statusModel = new Backbone.Model(text: "Loading...", thinking: yes)
+	window.wStatusModel = new Backbone.Model text: "Loading...", thinking: yes
 
 	window.myList = new Plist plist
 
-	window.rules = new RulesView({ model: myList }).render()
+	window.rules = new RulesView(model: myList).render()
 
-	window.header = new HeaderView({ model: myList }).render()
+	window.header = new HeaderView(model: myList).render()
 
 	window.active = new ActiveView
 
-
-	$(window.header.el).append(new StatusView(model: window.statusModel).render().el)
+	$(window.header.el).append new StatusView(model: wStatusModel).render().el
 
 	new SidebarView
 
-	window.colorPicker = new ColorPickerView model: new ColorModel
-	$('body').append window.colorPicker.el
-
-	$('tbody').fadeIn(100)
+	window.wColorPicker = new ColorPickerView model: new ColorModel
+	$('body').append wColorPicker.el
