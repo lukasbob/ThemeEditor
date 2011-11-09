@@ -1,5 +1,11 @@
-%h1 Theme Files available to edit
-%ul
-	- @files.each do |f|
-		%li
-			%a{ :href => "/?f=#{f[:file_escaped]}" }= f[:name]
+%header
+	%h1 Theme Files available to edit
+	%p.author Boom
+
+%div.wrapper
+
+	%section#sidebar
+		%ul
+			- @files.each do |f|
+				%li
+					%a{ :href => "/?f=#{f[:file_escaped]}" }= f[:name]

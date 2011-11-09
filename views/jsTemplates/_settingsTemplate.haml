@@ -7,3 +7,14 @@
 				{{field}}
 				%button.delete{ "data-key" => "{{k}}", :title => "Delete the {{text}} property." } Delete
 		<@ });@>
+
+%script#colorInput{ :type => "text/html" }
+	%span.colorwell
+		%input{ :id => "main_{{k}}", "data-key" => "{{k}}", :style => "background-color: {{rgba}}", :value => "{{v}}" }
+		%label.color{ :for => "main_{{k}}" } {{helpers.pad(v, 9)}} : {{rgba}}
+
+%script#numericInput{ :type => "text/html" }
+	%input.txt{ :id => "main_{{k}}", "data-key" => "{{k}}", :value => "{{v}}", :type => "number" }
+
+%script#textInput{ :type => "text/html" }
+	%input.txt{ :id => "main_{{k}}", "data-key" => "{{k}}", :value => "{{v}}" }
